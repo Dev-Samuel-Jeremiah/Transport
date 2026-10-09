@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}{{ transit.reference_code }} · Freightline{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <p class="page-eyebrow"><a href="{% url 'companies:detail' transit.company.pk %}">{{ transit.company.name }}</a></p>
+    <h1 class="page-title mono">{{ transit.reference_code }}</h1>
+    <p class="page-subtitle">{{ transit.origin }} → {{ transit.destination }}</p>
+  </div>
+  <span class="badge {% if transit.status == 'DELIVERED' %}badge-ok{% elif transit.status == 'CANCELLED' %}badge-danger{% elif transit.status == 'IN_TRANSIT' %}badge-info{% else %}badge-neutral{% endif %}" style="font-size:13px;padding:8px 16px;">{{ transit.get_status_display }}</span>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h2 class="section-title">Trip Details</h2>
+    <table>
+      <tbody>
+        <tr><td class="text-muted">Truck</td><td class="mono"><a href="{% url 'trucks:admin_detail' transit.truck.pk %}">{{ transit.truck.registration_number }}</a></td></tr>
+        <tr><td class="text-muted">Driver</td><td>{{ transit.driver.full_name|default:"Not assigned" }}</td></tr>
+        <tr><td class="text-muted">Cargo</td><td>{{ transit.cargo_description|default:"—" }}{% if transit.display_weight_mt %} · {{ transit.display_weight_mt|floatformat:"-2" }} MT{% endif %}</td></tr>
+        <tr><td class="text-muted">Expected arrival</td><td class="mono">{{ transit.expected_arrival|date:"d M Y, H:i"|default:"—" }}</td></tr>
+        <tr><td class="text-muted">Actual arrival</td><td class="mono">{{ transit.actual_arrival|date:"d M Y, H:i"|default:"—" }}</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2 class="section-title">Tracking Timeline</h2>
+    <div class="timeline">
+      {% for u in tracking_updates %}
+      <div class="timeline-item">
+        <div class="timeline-time">{{ u.recorded_at|date:"d M, H:i" }} · {{ u.get_source_display }}</div>
+        <div class="timeline-title">{{ u.get_status_display }}{% if u.location_text %} — {{ u.location_text }}{% endif %}</div>
+        {% if u.remarks %}<div class="timeline-body">{{ u.remarks }}</div>{% endif %}
+      </div>
+      {% empty %}
+      <p class="text-muted">No tracking updates yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

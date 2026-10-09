@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign in · Freightline</title>
+
+  <style>
+    :root {
+      --auth-ink: #15213c;
+      --auth-muted: #75829a;
+      --auth-line: #e3e8f1;
+      --auth-primary: #4666e8;
+      --auth-primary-dark: #2d48bd;
+      --auth-surface: #ffffff;
+      --auth-soft: #f6f8ff;
+      --auth-danger: #d63b59;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-width: 320px;
+      margin: 0;
+      background: #f4f6fb;
+      color: var(--auth-ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .auth-shell {
+      display: grid;
+      grid-template-columns: minmax(420px, 0.95fr) minmax(480px, 1.05fr);
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Left introduction panel */
+    .auth-showcase {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      padding: clamp(32px, 5vw, 70px);
+      background:
+        radial-gradient(circle at 78% 18%, rgba(101, 130, 255, 0.78), transparent 20%),
+        radial-gradient(circle at 20% 90%, rgba(26, 214, 182, 0.22), transparent 25%),
+        linear-gradient(135deg, #101a43 0%, #1c2c78 47%, #4668e7 100%);
+      color: #fff;
+    }
+
+    .auth-showcase::before,
+    .auth-showcase::after {
+      position: absolute;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 50%;
+      content: "";
+      pointer-events: none;
+    }
+
+    .auth-showcase::before {
+      width: 580px;
+      height: 580px;
+      top: -355px;
+      right: -135px;
+    }
+
+    .auth-showcase::after {
+      width: 420px;
+      height: 420px;
+      bottom: -295px;
+      left: -105px;
+    }
+
+    .auth-brand {
+      position: relative;
+      z-index: 1;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .auth-brand-mark {
+      display: grid;
+      width: 33px;
+      height: 33px;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: inset 0 1px rgba(255, 255, 255, 0.16);
+      font-size: 0.92rem;
+    }
+
+    .auth-showcase-copy {
+      position: relative;
+      z-index: 1;
+      max-width: 510px;
+      margin: auto 0;
+      padding: 70px 0;
+    }
+
+    .auth-kicker {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 15px;
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .auth-kicker::before {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #51e7c0;
+      box-shadow: 0 0 0 5px rgba(81, 231, 192, 0.16);
+      content: "";
+      animation: auth-pulse 2s ease-in-out infinite;
+    }
+
+    .auth-showcase h2 {
+      max-width: 500px;
+      margin: 0;
+      color: #fff;
+      font-size: clamp(2.2rem, 4.4vw, 4.25rem);
+      font-weight: 800;
+      letter-spacing: -0.065em;
+      line-height: 1.02;
+    }
+
+    .auth-showcase-copy > p {
+      max-width: 425px;
+      margin: 21px 0 0;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+
+    .auth-showcase-features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .auth-feature {
+      min-height: 88px;
+      padding: 13px;
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 13px;
+      background: rgba(11, 24, 81, 0.18);
+      backdrop-filter: blur(10px);
+    }
+
+    .auth-feature-icon {
+      display: grid;
+      width: 25px;
+      height: 25px;
+      margin-bottom: 11px;
+      place-items: center;
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.14);
+      color: #7df1d0;
+    }
+
+    .auth-feature-icon svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .auth-feature strong {
+      display: block;
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    .auth-feature span {
+      display: block;
+      margin-top: 4px;
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 0.65rem;
+      line-height: 1.3;
+    }
+
+    /* Form panel */
+    .auth-form-panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 34px;
+      background:
+        radial-gradient(circle at 90% 6%, rgba(102, 126, 242, 0.09), transparent 24%),
+        #f8faff;
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 435px;
+      padding: 42px;
+      border: 1px solid rgba(223, 229, 240, 0.95);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 20px 55px rgba(31, 48, 88, 0.1);
+      animation: auth-rise 0.6s ease both;
+    }
+
+    .auth-mobile-brand {
+      display: none;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 35px;
+      color: var(--auth-primary-dark);
+      font-size: 0.96rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .auth-mobile-brand-mark {
+      display: grid;
+      width: 31px;
+      height: 31px;
+      place-items: center;
+      border-radius: 9px;
+      background: var(--auth-primary);
+      color: #fff;
+      font-size: 0.85rem;
+    }
+
+    .auth-card-header {
+      margin-bottom: 29px;
+    }
+
+    .auth-card-kicker {
+      margin: 0 0 9px;
+      color: var(--auth-primary);
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .auth-title {
+      margin: 0;
+      color: var(--auth-ink);
+      font-size: clamp(1.75rem, 3vw, 2.15rem);
+      font-weight: 800;
+      letter-spacing: -0.05em;
+      line-height: 1.1;
+    }
+
+    .auth-card-subtitle {
+      margin: 11px 0 0;
+      color: var(--auth-muted);
+      font-size: 0.87rem;
+      line-height: 1.6;
+    }
+
+    .errorlist {
+      display: flex;
+      gap: 9px;
+      margin: 0 0 20px;
+      padding: 12px 13px;
+      border: 1px solid #ffd4dc;
+      border-radius: 10px;
+      background: #fff3f5;
+      color: var(--auth-danger);
+      font-size: 0.8rem;
+      line-height: 1.45;
+      list-style: none;
+    }
+
+    .errorlist::before {
+      display: grid;
+      width: 18px;
+      height: 18px;
+      flex: 0 0 18px;
+      place-items: center;
+      border-radius: 50%;
+      background: #ffe0e6;
+      color: var(--auth-danger);
+      content: "!";
+      font-size: 0.7rem;
+      font-weight: 900;
+    }
+
+    .errorlist li {
+      margin: 0;
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 19px;
+    }
+
+    .field-group {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field-group label {
+      color: #33415a;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .field-group input {
+      width: 100%;
+      min-height: 48px;
+      padding: 0 14px;
+      border: 1px solid #dce2ed;
+      border-radius: 10px;
+      outline: 0;
+      background: #fbfcff;
+      color: var(--auth-ink);
+      font: inherit;
+      font-size: 0.88rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .field-group input::placeholder {
+      color: #a6b0c1;
+    }
+
+    .field-group input:hover {
+      border-color: #c5cee1;
+    }
+
+    .field-group input:focus {
+      border-color: var(--auth-primary);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(70, 102, 232, 0.12);
+    }
+
+    .auth-submit {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 48px;
+      margin-top: 4px;
+      border: 0;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #4869ec, #354fca);
+      box-shadow: 0 9px 18px rgba(56, 80, 202, 0.22);
+      color: #fff;
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.87rem;
+      font-weight: 800;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    }
+
+    .auth-submit:hover {
+      box-shadow: 0 13px 23px rgba(56, 80, 202, 0.3);
+      filter: brightness(1.04);
+      transform: translateY(-2px);
+    }
+
+    .auth-submit:active {
+      transform: translateY(0);
+    }
+
+    .auth-footer-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin: 24px 0 0;
+      padding-top: 20px;
+      border-top: 1px solid #edf0f5;
+      color: var(--auth-muted);
+      font-size: 0.75rem;
+      line-height: 1.55;
+    }
+
+    .auth-footer-note svg {
+      width: 15px;
+      height: 15px;
+      flex: 0 0 15px;
+      margin-top: 2px;
+      color: var(--auth-primary);
+    }
+
+    @keyframes auth-rise {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes auth-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.48; }
+    }
+
+    @media (max-width: 900px) {
+      .auth-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .auth-showcase {
+        display: none;
+      }
+
+      .auth-form-panel {
+        min-height: 100vh;
+      }
+
+      .auth-mobile-brand {
+        display: flex;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .auth-form-panel {
+        align-items: flex-start;
+        padding: 20px;
+      }
+
+      .auth-card {
+        margin-top: 20px;
+        padding: 29px 23px;
+        border-radius: 18px;
+      }
+
+      .auth-mobile-brand {
+        margin-bottom: 29px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="auth-shell">
+
+    <aside class="auth-showcase">
+      <div class="auth-brand">
+        <span class="auth-brand-mark">◆</span>
+        Freightline TRX
+      </div>
+
+      <div class="auth-showcase-copy">
+        <p class="auth-kicker">Connected logistics operations</p>
+        <h2>Control every movement with clarity.</h2>
+        <p>
+          One secure platform for managing fleets, waybills, drivers, transits, and delivery performance.
+        </p>
+      </div>
+
+      <div class="auth-showcase-features">
+        <div class="auth-feature">
+          <span class="auth-feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 5h11v11H3zM14 9h4l3 3v4h-7z"/>
+              <circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>
+            </svg>
+          </span>
+          <strong>Fleet visibility</strong>
+          <span>Track every vehicle</span>
+        </div>
+
+        <div class="auth-feature">
+          <span class="auth-feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 3h9l4 4v14H6z"/>
+              <path d="M15 3v5h5M9 13h6M9 17h6"/>
+            </svg>
+          </span>
+          <strong>Waybills</strong>
+          <span>Documents in order</span>
+        </div>
+
+        <div class="auth-feature">
+          <span class="auth-feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12l4 4L19 6"/>
+            </svg>
+          </span>
+          <strong>Delivery control</strong>
+          <span>Stay ahead of trips</span>
+        </div>
+      </div>
+    </aside>
+
+    <section class="auth-form-panel">
+      <div class="auth-card">
+
+        <div class="auth-mobile-brand">
+          <span class="auth-mobile-brand-mark">◆</span>
+          Freightline TRX
+        </div>
+
+        <header class="auth-card-header">
+          <p class="auth-card-kicker">Welcome back</p>
+          <h1 class="auth-title">Sign in to your workspace</h1>
+          <p class="auth-card-subtitle">
+            Use your account credentials to access your logistics dashboard.
+          </p>
+        </header>
+
+        {% if form.errors %}
+          <ul class="errorlist">
+            <li>Incorrect username or password. Please try again.</li>
+          </ul>
+        {% endif %}
+
+        <form method="post" class="auth-form">
+          {% csrf_token %}
+
+          <div class="field-group">
+            <label for="id_username">Username</label>
+            {{ form.username }}
+          </div>
+
+          <div class="field-group">
+            <label for="id_password">Password</label>
+            {{ form.password }}
+          </div>
+
+          <button type="submit" class="auth-submit">Sign in securely</button>
+          <input type="hidden" name="next" value="{{ next }}">
+        </form>
+
+        <p class="auth-footer-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="5" y="10" width="14" height="10" rx="2"/>
+            <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+          </svg>
+          <span>
+            Admin and company accounts share this secure sign-in. You’ll be directed to the right dashboard automatically.
+          </span>
+        </p>
+
+      </div>
+    </section>
+
+  </main>
+</body>
+</html>

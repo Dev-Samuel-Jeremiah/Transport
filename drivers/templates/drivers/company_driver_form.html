@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Edit {{ object.full_name }} · Freightline{% endblock %}
+{% block content %}
+<style>
+  .driver-form-page {
+    max-width: 680px;
+  }
+
+  .driver-form-card form {
+    padding: 26px 28px 6px;
+  }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 16px;
+  }
+
+  .errorlist {
+    margin: 6px 0 0;
+    padding-left: 18px;
+    color: var(--danger);
+    font-size: 0.79rem;
+    list-style: disc;
+  }
+
+  .driver-form-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 20px 28px;
+    border-top: 1px solid var(--slate-100);
+    background: var(--slate-50);
+  }
+
+  @media (max-width: 640px) {
+    .field-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="driver-form-page">
+  <div class="page-header">
+    <div>
+      <p class="page-eyebrow">Fleet</p>
+      <h1 class="page-title">Edit {{ object.full_name }}</h1>
+      <p class="page-subtitle">Update this driver's contact details. License and status are managed by Freightline admin.</p>
+    </div>
+  </div>
+
+  <div class="card driver-form-card">
+    <form method="post" id="driver-form">
+      {% csrf_token %}
+      {% if form.non_field_errors %}{{ form.non_field_errors }}{% endif %}
+
+      <div class="field-grid">
+        <div class="field-group">
+          <label for="{{ form.full_name.id_for_label }}">{{ form.full_name.label }} *</label>
+          {{ form.full_name }}
+          {% if form.full_name.errors %}{{ form.full_name.errors }}{% endif %}
+        </div>
+        <div class="field-group">
+          <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }} *</label>
+          {{ form.phone }}
+          {% if form.phone.errors %}{{ form.phone.errors }}{% endif %}
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+        {{ form.email }}
+        {% if form.email.errors %}{{ form.email.errors }}{% endif %}
+      </div>
+
+      <div class="field-group">
+        <label for="{{ form.address.id_for_label }}">{{ form.address.label }}</label>
+        {{ form.address }}
+        {% if form.address.errors %}{{ form.address.errors }}{% endif %}
+      </div>
+    </form>
+
+    <div class="driver-form-footer">
+      <a href="{% url 'drivers:company_detail' object.pk %}" class="btn btn-outline">Cancel</a>
+      <button type="submit" form="driver-form" class="btn btn-accent">Save Changes</button>
+    </div>
+  </div>
+</div>
+{% endblock %}

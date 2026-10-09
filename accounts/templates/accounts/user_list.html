@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+{% block title %}Users · Freightline{% endblock %}
+{% block content %}
+<style>
+  .users-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 18px;
+    margin-bottom: 20px;
+    border: 1px solid var(--slate-200);
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.035);
+  }
+
+  .users-filters input[type="text"] {
+    flex: 1 1 320px;
+    min-width: 260px;
+  }
+
+  .users-filters select {
+    min-width: 210px;
+  }
+
+  .users-notice {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border: 1px solid #fde68a;
+    border-radius: 12px;
+    background: #fffbeb;
+    color: #92400e;
+    font-size: 0.84rem;
+  }
+
+  .users-table-wrap table {
+    width: auto;
+    max-width: 100%;
+  }
+
+  .users-table-wrap th,
+  .users-table-wrap td {
+    padding: 11px 12px;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+
+  .users-table-wrap td {
+    font-size: 0.86rem;
+  }
+
+  .users-table-wrap td.company-cell {
+    max-width: 200px;
+    white-space: normal;
+  }
+
+  .status-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  .member-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .member-avatar {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    flex: none;
+    place-items: center;
+    border-radius: 10px;
+    background: var(--blue-100);
+    color: var(--blue-500);
+    font-size: 0.85rem;
+    font-weight: 800;
+  }
+
+  .member-avatar.is-disabled {
+    background: var(--slate-100);
+    color: var(--slate-400);
+  }
+
+  .member-name {
+    color: var(--slate-950);
+    font-size: 0.88rem;
+    font-weight: 750;
+  }
+
+  .member-handle {
+    color: var(--slate-500);
+    font-size: 0.76rem;
+  }
+
+  .row-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .row-actions .btn {
+    min-height: 30px;
+    padding: 5px 9px;
+    font-size: 0.72rem;
+  }
+
+  .row-actions form {
+    margin: 0;
+  }
+
+  .btn-danger-soft {
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+    color: #b91c1c;
+  }
+
+  .btn-danger-soft:hover {
+    background: #fee2e2;
+  }
+
+  .btn-ok-soft {
+    border: 1px solid #bbf7d0;
+    background: #f0fdf4;
+    color: #15803d;
+  }
+
+  .btn-ok-soft:hover {
+    background: #dcfce7;
+  }
+
+  .users-empty {
+    padding: 48px 20px;
+    color: var(--slate-500);
+    text-align: center;
+  }
+
+  .users-empty h3 {
+    margin: 0 0 6px;
+    color: var(--slate-950);
+    font-size: 1rem;
+  }
+
+  .users-empty p {
+    margin: 0 0 16px;
+    font-size: 0.87rem;
+  }
+
+  .users-pager {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+  }
+</style>
+
+<div class="page-header">
+  <div>
+    <p class="page-eyebrow">Network</p>
+    <h1 class="page-title">Users</h1>
+    <p class="page-subtitle">Logins enrolled under a transporter. Each user is tied to one company and can only see and change that company's data.</p>
+  </div>
+  <a href="{% url 'accounts:user_enroll' %}{% if selected_company %}?company={{ selected_company }}{% endif %}" class="btn btn-accent">+ Enroll User</a>
+</div>
+
+{% if pending_password_count %}
+  <div class="users-notice">
+    <span>🔒</span>
+    <span><strong>{{ pending_password_count }}</strong> user{{ pending_password_count|pluralize }} still on the temporary password <code>{{ temporary_password }}</code> — they'll be forced to change it the first time they sign in.</span>
+  </div>
+{% endif %}
+
+<form method="get" class="users-filters">
+  <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search name, username, email or company…" aria-label="Search users">
+  <select name="company" aria-label="Filter by company" onchange="this.form.submit()">
+    <option value="">All companies</option>
+    {% for c in companies %}
+      <option value="{{ c.pk }}" {% if selected_company == c.pk|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="btn btn-outline btn-sm">Filter</button>
+  {% if request.GET.q or selected_company %}
+    <a href="{% url 'accounts:user_list' %}" class="btn btn-outline btn-sm">Reset</a>
+  {% endif %}
+</form>
+
+<div class="table-wrap users-table-wrap">
+  {% if users %}
+  <table>
+    <thead>
+      <tr>
+        <th>User</th><th>Company</th><th>Last sign-in</th><th>Status</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td>
+          <div class="member-cell">
+            <span class="member-avatar {% if not u.is_active %}is-disabled{% endif %}">{{ u.display_name|slice:":1"|upper }}</span>
+            <div>
+              <div class="member-name">{{ u.display_name }}</div>
+              {% if u.get_full_name %}<div class="member-handle mono">{{ u.username }}</div>{% endif %}
+            </div>
+          </div>
+        </td>
+        <td class="company-cell"><a href="{% url 'companies:detail' u.company.pk %}">{{ u.company.name }}</a></td>
+        <td class="text-muted">{{ u.last_login|date:"d M Y, H:i"|default:"Never" }}</td>
+        <td>
+          <div class="status-stack">
+            {% if u.is_active %}<span class="badge badge-ok">Active</span>{% else %}<span class="badge badge-neutral">Disabled</span>{% endif %}
+            {% if u.password_is_temporary %}<span class="badge badge-warn">Temporary password</span>{% endif %}
+          </div>
+        </td>
+        <td>
+          <div class="row-actions">
+            <a href="{% url 'accounts:user_edit' u.pk %}?next={{ request.get_full_path|urlencode }}" class="btn btn-outline btn-sm">Edit</a>
+            <form method="post" action="{% url 'accounts:user_reset_password' u.pk %}"
+                  onsubmit="return confirm('Reset the password for {{ u.display_name|escapejs }} to the temporary password? They will have to set a new one the next time they sign in.');">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              <button type="submit" class="btn btn-outline btn-sm">Reset password</button>
+            </form>
+            <form method="post" action="{% url 'accounts:user_toggle_active' u.pk %}"
+                  onsubmit="return confirm('{% if u.is_active %}Disable{% else %}Enable{% endif %} {{ u.display_name|escapejs }}? {% if u.is_active %}They will no longer be able to sign in.{% else %}They will be able to sign in again.{% endif %}');">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              {% if u.is_active %}
+                <button type="submit" class="btn btn-danger-soft btn-sm">Disable</button>
+              {% else %}
+                <button type="submit" class="btn btn-ok-soft btn-sm">Enable</button>
+              {% endif %}
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="users-empty">
+    <h3>{% if request.GET.q or selected_company %}No users match those filters{% else %}No users enrolled yet{% endif %}</h3>
+    <p>{% if request.GET.q or selected_company %}Try a different search or company.{% else %}Enroll a user under a transporter so they can sign in and manage that company.{% endif %}</p>
+    <a href="{% url 'accounts:user_enroll' %}" class="btn btn-primary btn-sm">+ Enroll User</a>
+  </div>
+  {% endif %}
+</div>
+
+{% if is_paginated %}
+<div class="users-pager">
+  {% if page_obj.has_previous %}<a class="btn btn-outline btn-sm" href="?{% if filter_query %}{{ filter_query }}&{% endif %}page={{ page_obj.previous_page_number }}">← Prev</a>{% endif %}
+  <span class="text-muted">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a class="btn btn-outline btn-sm" href="?{% if filter_query %}{{ filter_query }}&{% endif %}page={{ page_obj.next_page_number }}">Next →</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,483 @@
+{% extends "base.html" %}
+{% block title %}LTIs · Freightline{% endblock %}
+
+{% block content %}
+
+<style>
+  .lti-list-page {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 8px 0 32px;
+  }
+
+  .lti-list-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 28px 30px;
+    margin-bottom: 24px;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background:
+      radial-gradient(circle at top right, rgba(37, 99, 235, 0.09), transparent 32%),
+      linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+  }
+
+  .lti-list-hero .page-eyebrow {
+    margin: 0 0 8px;
+    color: #2563eb;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .lti-list-hero .page-title {
+    margin: 0;
+    color: #0f172a;
+    font-size: clamp(1.7rem, 3vw, 2.3rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+  }
+
+  .lti-list-hero .page-subtitle {
+    max-width: 590px;
+    margin: 10px 0 0;
+    color: #64748b;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .lti-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  .lti-actions .btn {
+    white-space: nowrap;
+  }
+
+  .lti-filters-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.035);
+  }
+
+  .lti-filter-intro {
+    flex-shrink: 0;
+  }
+
+  .lti-filter-intro h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 0.95rem;
+    font-weight: 800;
+  }
+
+  .lti-filter-intro p {
+    margin: 4px 0 0;
+    color: #94a3b8;
+    font-size: 0.82rem;
+  }
+
+  .lti-filters {
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+    margin: 0;
+  }
+
+  .lti-filters select {
+    min-width: 190px;
+    min-height: 42px;
+    padding: 0 38px 0 13px;
+    border: 1px solid #dbe3ee;
+    border-radius: 9px;
+    background-color: #fff;
+    color: #334155;
+    font-size: 0.88rem;
+    font-weight: 600;
+    outline: none;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  }
+
+  .lti-filters select:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  }
+
+  .lti-table-card {
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.045);
+  }
+
+  .lti-table-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #fcfdff;
+  }
+
+  .lti-table-card-header h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1rem;
+    font-weight: 800;
+  }
+
+  .lti-table-card-header p {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 0.85rem;
+  }
+
+  .lti-record-label {
+    padding: 6px 11px;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 0.78rem;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .lti-table-card .table-wrap {
+    margin: 0;
+    overflow-x: auto;
+  }
+
+  .lti-table-card table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .lti-table-card thead {
+    background: #f8fafc;
+  }
+
+  .lti-table-card th {
+    padding: 10px 12px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #64748b;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.065em;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .lti-table-card td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eef2f7;
+    color: #334155;
+    font-size: 0.9rem;
+    vertical-align: middle;
+  }
+
+  .lti-table-card tbody tr {
+    transition: background 0.18s ease;
+  }
+
+  .lti-table-card tbody tr:hover {
+    background: #f8fbff;
+  }
+
+  .lti-table-card tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .lti-link {
+    color: #1d4ed8;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .lti-link:hover {
+    color: #1e40af;
+    text-decoration: underline;
+  }
+
+  .lti-number {
+    color: #0f172a;
+    font-weight: 800;
+  }
+
+  .waybill-total {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    padding: 4px 8px;
+    border-radius: 8px;
+    background: #f1f5f9;
+    color: #334155;
+    font-size: 0.8rem;
+    font-weight: 800;
+  }
+
+  .empty-state {
+    padding: 56px 24px;
+    text-align: center;
+  }
+
+  .empty-state-icon {
+    display: grid;
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 14px;
+    place-items: center;
+    border-radius: 14px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 1.4rem;
+  }
+
+  .empty-state h3 {
+    margin: 0 0 6px;
+    color: #0f172a;
+    font-size: 1rem;
+  }
+
+  .empty-state p {
+    margin: 0;
+    color: #64748b;
+  }
+
+  .lti-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .lti-pagination-info {
+    color: #64748b;
+    font-size: 0.88rem;
+  }
+
+  @media (max-width: 900px) {
+    .lti-list-hero,
+    .lti-filters-panel {
+      flex-direction: column;
+    }
+
+    .lti-actions,
+    .lti-filters {
+      width: 100%;
+      justify-content: flex-start;
+    }
+
+    .lti-filter-intro {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .lti-list-page {
+      padding-top: 0;
+    }
+
+    .lti-list-hero {
+      padding: 22px 20px;
+    }
+
+    .lti-actions .btn {
+      flex: 1 1 100%;
+      text-align: center;
+    }
+
+    .lti-filters-panel {
+      padding: 18px;
+    }
+
+    .lti-filters select {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .lti-table-card-header {
+      align-items: flex-start;
+      flex-direction: column;
+      padding: 18px 20px;
+    }
+
+    .lti-pagination {
+      flex-wrap: wrap;
+    }
+  }
+</style>
+
+<div class="lti-list-page">
+
+  <section class="lti-list-hero">
+    <div>
+      <p class="page-eyebrow">Network Management</p>
+      <h1 class="page-title">LTIs</h1>
+      <p class="page-subtitle">
+        Monitor and manage all Load Transport Instructions raised by companies across the platform.
+      </p>
+    </div>
+
+    <div class="lti-actions">
+      <a href="{% url 'waybills:admin_lti_export' %}?format=xlsx&{{ request.GET.urlencode }}" class="btn btn-outline">
+        Download Excel
+      </a>
+
+      <a href="{% url 'waybills:admin_lti_export' %}?format=csv&{{ request.GET.urlencode }}" class="btn btn-outline">
+        Download CSV
+      </a>
+
+      <a href="{% url 'waybills:admin_waybill_list' %}" class="btn btn-outline">
+        View Waybill Register
+      </a>
+    </div>
+  </section>
+
+  <section class="lti-filters-panel">
+    <div class="lti-filter-intro">
+      <h2>Filter LTIs</h2>
+      <p>Narrow the register by company or current status.</p>
+    </div>
+
+    <form method="get" class="lti-filters">
+      <select name="company" onchange="this.form.submit()" aria-label="Filter by company">
+        <option value="">All companies</option>
+        {% for c in companies %}
+          <option value="{{ c.pk }}" {% if request.GET.company == c.pk|stringformat:"s" %}selected{% endif %}>
+            {{ c.name }}
+          </option>
+        {% endfor %}
+      </select>
+
+      <select name="status" onchange="this.form.submit()" aria-label="Filter by status">
+        <option value="">All statuses</option>
+        {% for value, label in status_choices %}
+          <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>
+            {{ label }}
+          </option>
+        {% endfor %}
+      </select>
+    </form>
+  </section>
+
+  <section class="lti-table-card">
+    <div class="lti-table-card-header">
+      <div>
+        <h2>LTI Register</h2>
+        <p>Select an LTI number to view its associated waybills and details.</p>
+      </div>
+
+      <span class="lti-record-label">
+        {{ ltis|length }} record{{ ltis|length|pluralize }}
+      </span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>LTI No.</th>
+            <th>Company</th>
+            <th>STO</th>
+            <th>Status</th>
+            <th>Waybills</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for lti in ltis %}
+          <tr>
+            <td>
+              <a class="lti-link mono" href="{% url 'waybills:admin_lti_detail' lti.pk %}">
+                <strong class="lti-number">{{ lti.lti_number }}</strong>
+              </a>
+            </td>
+
+            <td>
+              <a class="lti-link" href="{% url 'companies:detail' lti.company_id %}">
+                {{ lti.company.name }}
+              </a>
+            </td>
+
+            <td class="text-muted mono">
+              {{ lti.sto|default:"—" }}
+            </td>
+
+            <td>
+              {% if lti.status == 'OPEN' %}
+                <span class="badge badge-ok">Open</span>
+              {% else %}
+                <span class="badge badge-neutral">Closed</span>
+              {% endif %}
+            </td>
+
+            <td>
+              <span class="waybill-total">{{ lti.waybill_count }}</span>
+            </td>
+
+            <td class="text-muted mono">
+              {{ lti.created_at|date:"d M, H:i" }}
+            </td>
+          </tr>
+
+          {% empty %}
+          <tr>
+            <td colspan="6">
+              <div class="empty-state">
+                <div class="empty-state-icon">📋</div>
+                <h3>No LTIs found</h3>
+                <p>There are no LTIs matching the selected filters.</p>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  {% if is_paginated %}
+  <nav class="lti-pagination" aria-label="LTI pagination">
+    {% if page_obj.has_previous %}
+      <a class="btn btn-outline btn-sm" href="?page={{ page_obj.previous_page_number }}">
+        ← Previous
+      </a>
+    {% endif %}
+
+    <span class="lti-pagination-info">
+      Page <strong>{{ page_obj.number }}</strong> of <strong>{{ page_obj.paginator.num_pages }}</strong>
+    </span>
+
+    {% if page_obj.has_next %}
+      <a class="btn btn-outline btn-sm" href="?page={{ page_obj.next_page_number }}">
+        Next →
+      </a>
+    {% endif %}
+  </nav>
+  {% endif %}
+
+</div>
+
+{% endblock %}

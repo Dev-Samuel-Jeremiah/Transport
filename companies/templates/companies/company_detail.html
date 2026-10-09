@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+{% block title %}{{ company.name }} · Freightline{% endblock %}
+{% block content %}
+<style>
+  .company-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+
+  .company-hero-main {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .company-avatar {
+    display: grid;
+    width: 68px;
+    height: 68px;
+    flex: none;
+    place-items: center;
+    border: 1px solid var(--slate-200);
+    border-radius: 16px;
+    background: var(--blue-100);
+    color: var(--blue-500);
+    font-size: 1.4rem;
+    font-weight: 800;
+  }
+
+  .company-hero-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .badge-danger {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
+
+  .company-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .company-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+
+  .info-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--slate-100);
+  }
+
+  .info-card-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .info-card-icon {
+    display: grid;
+    width: 32px;
+    height: 32px;
+    flex: none;
+    place-items: center;
+    border-radius: 9px;
+    background: var(--blue-100);
+    color: var(--blue-500);
+  }
+
+  .info-card-header h2 {
+    margin: 0;
+    color: var(--slate-950);
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .info-card-body {
+    padding: 18px 22px 22px;
+  }
+
+  .info-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--slate-100);
+  }
+
+  .info-row:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .info-row:first-child {
+    padding-top: 0;
+  }
+
+  .info-label {
+    color: var(--slate-500);
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+
+  .info-value {
+    color: var(--slate-800);
+    font-size: 0.88rem;
+    font-weight: 650;
+    text-align: right;
+  }
+
+  .list-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--slate-100);
+  }
+
+  .list-row:first-child {
+    padding-top: 0;
+  }
+
+  .list-row:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .list-row-name {
+    flex: 1;
+    min-width: 0;
+    color: var(--slate-800);
+    font-size: 0.87rem;
+    font-weight: 650;
+  }
+
+  .list-row-name a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .list-row-name a:hover {
+    color: var(--blue-500);
+  }
+
+  .list-empty {
+    padding: 18px 0;
+    color: var(--slate-500);
+    font-size: 0.85rem;
+    text-align: center;
+  }
+
+  .disclosure summary {
+    cursor: pointer;
+    color: var(--blue-500);
+    font-size: 0.83rem;
+    font-weight: 750;
+    list-style: none;
+  }
+
+  .disclosure summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .disclosure summary::before {
+    display: inline-block;
+    margin-right: 6px;
+    content: "›";
+    transition: transform 0.15s ease;
+  }
+
+  .disclosure[open] summary::before {
+    transform: rotate(90deg);
+  }
+
+  .disclosure form {
+    padding-top: 16px;
+    margin-top: 14px;
+    border-top: 1px solid var(--slate-100);
+  }
+
+  @media (max-width: 900px) {
+    .company-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="company-hero">
+  <div class="company-hero-main">
+    <div class="company-avatar">{{ company.name|slice:":1"|upper }}</div>
+    <div>
+      <p class="page-eyebrow">Company Profile</p>
+      <h1 class="page-title">{{ company.name }}</h1>
+      <div class="company-hero-badges">
+        <span class="badge mono badge-neutral">{{ company.registration_number }}</span>
+        <span class="badge {% if company.is_active %}badge-ok{% else %}badge-neutral{% endif %}">{{ company.get_status_display }}</span>
+      </div>
+    </div>
+  </div>
+  <div class="company-hero-actions">
+    <a href="{% url 'companies:edit' company.pk %}" class="btn btn-outline">Edit</a>
+    <a href="{% url 'drivers:create' %}?company={{ company.pk }}" class="btn btn-outline">+ Register Driver</a>
+    <a href="{% url 'accounts:user_enroll' %}?company={{ company.pk }}" class="btn btn-accent">+ Enroll User</a>
+  </div>
+</div>
+
+<div class="company-grid">
+  <div class="stack">
+
+    <section class="card">
+      <div class="info-card-header">
+        <div class="info-card-heading">
+          <span class="info-card-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9">
+              <path d="M4 21V5l8-3v19M4 9h8M16 8h4v13h-4zM8 13h1M8 17h1M16 12h1M16 16h1"/>
+            </svg>
+          </span>
+          <h2>Company Details</h2>
+        </div>
+      </div>
+      <div class="info-card-body">
+        <div class="info-row"><span class="info-label">Contact person</span><span class="info-value">{{ company.contact_person|default:"—" }}</span></div>
+        <div class="info-row"><span class="info-label">Phone</span><span class="info-value mono">{{ company.phone|default:"—" }}</span></div>
+        <div class="info-row"><span class="info-label">Email</span><span class="info-value">{{ company.email|default:"—" }}</span></div>
+        <div class="info-row"><span class="info-label">Address</span><span class="info-value">{{ company.address|default:"—" }}</span></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="info-card-header">
+        <div class="info-card-heading">
+          <span class="info-card-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9">
+              <rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+            </svg>
+          </span>
+          <h2>Users ({{ users.count }})</h2>
+        </div>
+        {% if users %}<a href="{% url 'accounts:user_list' %}?company={{ company.pk }}" class="btn btn-outline btn-sm">Manage</a>{% endif %}
+      </div>
+      <div class="info-card-body">
+        {% if users %}
+          {% for u in users %}
+            <div class="list-row">
+              <span class="list-row-name">
+                {{ u.display_name }}
+                <span class="mono text-muted" style="font-weight:500;font-size:0.78rem;">&nbsp;{{ u.username }}</span>
+              </span>
+              {% if u.password_is_temporary %}<span class="badge badge-warn">Temporary password</span>{% endif %}
+              <span class="badge {% if u.is_active %}badge-ok{% else %}badge-neutral{% endif %}">{% if u.is_active %}Active{% else %}Disabled{% endif %}</span>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="list-empty">No one can sign in for this company yet.</p>
+          <div style="text-align:center;"><a href="{% url 'accounts:user_enroll' %}?company={{ company.pk }}" class="btn btn-primary btn-sm">+ Enroll the first user</a></div>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="info-card-header">
+        <div class="info-card-heading">
+          <span class="info-card-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9">
+              <circle cx="12" cy="8" r="3.3"/><path d="M5 20c.6-3.5 3-5.3 7-5.3s6.4 1.8 7 5.3"/>
+            </svg>
+          </span>
+          <h2>Drivers ({{ drivers.count }})</h2>
+        </div>
+      </div>
+      <div class="info-card-body">
+        {% if drivers %}
+          {% for d in drivers %}
+            <div class="list-row">
+              <span class="list-row-name"><a href="{% url 'drivers:detail' d.pk %}">{{ d.full_name }}</a></span>
+              <span class="mono text-muted">{{ d.license_number }}</span>
+              <span class="badge {% if d.status == 'ACTIVE' %}badge-ok{% elif d.status == 'ON_TRIP' %}badge-info{% else %}badge-neutral{% endif %}">{{ d.get_status_display }}</span>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="list-empty">No drivers registered under this company yet.</p>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="info-card-header">
+        <div class="info-card-heading">
+          <span class="info-card-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9">
+              <path d="M3 5h11v11H3zM14 9h4l3 3v4h-7z"/>
+              <circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>
+            </svg>
+          </span>
+          <h2>Trucks ({{ trucks.count }})</h2>
+        </div>
+      </div>
+      <div class="info-card-body">
+        {% if trucks %}
+          {% for t in trucks %}
+            <div class="list-row">
+              <span class="list-row-name mono"><a href="{% url 'trucks:admin_detail' t.pk %}">{{ t.registration_number }}</a></span>
+              <span class="text-muted">{{ t.last_known_location|default:"No location yet" }}</span>
+              <span class="badge {% if t.status == 'AVAILABLE' %}badge-ok{% elif t.status == 'ON_TRIP' %}badge-info{% else %}badge-neutral{% endif %}">{{ t.get_status_display }}</span>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="list-empty">This company hasn't added any trucks yet.</p>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+
+  <section class="card">
+    <div class="info-card-header">
+      <div class="info-card-heading">
+        <span class="info-card-icon">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9">
+            <path d="M6 3h9l4 4v14H6z"/><path d="M15 3v5h5M9 13h6M9 17h6"/>
+          </svg>
+        </span>
+        <h2>Documents</h2>
+      </div>
+    </div>
+    <div class="info-card-body">
+      {% if documents %}
+        {% for doc in documents %}
+          <div class="list-row">
+            <span class="list-row-name">{{ doc.get_doc_type_display }}</span>
+            {% if doc.is_expired %}<span class="badge badge-danger">Expired</span>
+            {% elif doc.is_expiring_soon %}<span class="badge badge-warn">Expiring Soon</span>
+            {% else %}<span class="badge badge-ok">Valid</span>{% endif %}
+            <a href="{{ doc.file.url }}" target="_blank" class="btn btn-outline btn-sm">View</a>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="list-empty">No documents on file.</p>
+      {% endif %}
+
+      <details class="disclosure">
+        <summary>Upload a document</summary>
+        <form method="post" enctype="multipart/form-data" action="{% url 'companies:document_upload' company.pk %}">
+          {% csrf_token %}
+          {% for field in document_form %}
+            <div class="field-group">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+            </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-primary btn-sm">Upload</button>
+        </form>
+      </details>
+    </div>
+  </section>
+</div>
+{% endblock %}

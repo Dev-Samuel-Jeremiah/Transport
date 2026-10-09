@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+{% block title %}{% if editing %}Edit {{ target.display_name }}{% else %}Enroll User{% endif %} · Freightline{% endblock %}
+{% block content %}
+<style>
+  .enroll-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 24px;
+    align-items: start;
+    max-width: 1040px;
+  }
+
+  .enroll-card form {
+    padding: 26px 28px 8px;
+  }
+
+  .form-section + .form-section {
+    padding-top: 22px;
+    margin-top: 22px;
+    border-top: 1px solid var(--slate-100);
+  }
+
+  .form-section-title {
+    margin: 0 0 16px;
+    color: var(--slate-950);
+    font-size: 0.86rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 16px;
+  }
+
+  .enroll-card select,
+  .enroll-card input[type="text"],
+  .enroll-card input[type="email"] {
+    width: 100%;
+  }
+
+  .errorlist {
+    margin: 6px 0 0;
+    padding-left: 18px;
+    color: var(--danger);
+    font-size: 0.79rem;
+    list-style: disc;
+  }
+
+  .enroll-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 20px 28px;
+    border-top: 1px solid var(--slate-100);
+    background: var(--slate-50);
+  }
+
+  .how-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--slate-100);
+  }
+
+  .how-card-icon {
+    display: grid;
+    width: 32px;
+    height: 32px;
+    flex: none;
+    place-items: center;
+    border-radius: 9px;
+    background: var(--blue-100);
+    color: var(--blue-500);
+  }
+
+  .how-card-header h2 {
+    margin: 0;
+    color: var(--slate-950);
+    font-size: 0.95rem;
+    font-weight: 800;
+  }
+
+  .how-list {
+    padding: 8px 22px 22px;
+    margin: 0;
+    list-style: none;
+  }
+
+  .how-list li {
+    display: flex;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--slate-100);
+    color: var(--slate-600);
+    font-size: 0.83rem;
+    line-height: 1.55;
+  }
+
+  .how-list li:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .how-step {
+    display: grid;
+    width: 24px;
+    height: 24px;
+    flex: none;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--blue-100);
+    color: var(--blue-500);
+    font-size: 0.72rem;
+    font-weight: 800;
+  }
+
+  .how-list strong {
+    color: var(--slate-950);
+  }
+
+  .how-list code {
+    padding: 1px 6px;
+    border-radius: 5px;
+    background: var(--slate-100);
+    color: var(--slate-800);
+    font-size: 0.82rem;
+  }
+
+  @media (max-width: 960px) {
+    .enroll-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .field-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="page-header">
+  <div>
+    <p class="page-eyebrow">Network</p>
+    <h1 class="page-title">{% if editing %}Edit {{ target.display_name }}{% else %}Enroll a User{% endif %}</h1>
+    <p class="page-subtitle">{% if editing %}Update this user's profile, username or company. Their password isn't affected.{% else %}Give someone a login and tie it to one transporter. They'll only ever see and change that company's data.{% endif %}</p>
+  </div>
+</div>
+
+<div class="enroll-layout">
+
+  <div class="card enroll-card">
+    <form method="post" id="enroll-form">
+      {% csrf_token %}
+      {% if form.non_field_errors %}{{ form.non_field_errors }}{% endif %}
+
+      <div class="form-section">
+        <h2 class="form-section-title">Company access</h2>
+        <div class="field-group">
+          <label for="{{ form.company.id_for_label }}">{{ form.company.label }} *</label>
+          {{ form.company }}
+          {% if form.company.help_text %}<p class="helptext">{{ form.company.help_text }}</p>{% endif %}
+          {% if form.company.errors %}{{ form.company.errors }}{% endif %}
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h2 class="form-section-title">Who is this?</h2>
+        <div class="field-group">
+          <label for="{{ form.full_name.id_for_label }}">{{ form.full_name.label }} *</label>
+          {{ form.full_name }}
+          {% if form.full_name.errors %}{{ form.full_name.errors }}{% endif %}
+        </div>
+        <div class="field-grid">
+          <div class="field-group">
+            <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+            {{ form.email }}
+            {% if form.email.errors %}{{ form.email.errors }}{% endif %}
+          </div>
+          <div class="field-group">
+            <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+            {{ form.phone }}
+            {% if form.phone.errors %}{{ form.phone.errors }}{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h2 class="form-section-title">Sign-in</h2>
+        <div class="field-group">
+          <label for="{{ form.username.id_for_label }}">{{ form.username.label }} *</label>
+          {{ form.username }}
+          <p class="helptext">{{ form.username.help_text }}{% if editing %} Changing it means they must sign in with the new one from now on.{% endif %}</p>
+          {% if form.username.errors %}{{ form.username.errors }}{% endif %}
+        </div>
+        {% if editing %}
+        <div class="field-group">
+          <label>Password</label>
+          <p class="helptext" style="margin:0;">
+            {% if target.password_is_temporary %}<span class="badge badge-warn">Temporary password</span> — they haven't chosen their own yet.{% else %}<span class="badge badge-ok">Set by user</span> — this page can't change it.{% endif %}
+            Use <strong>Reset password</strong> on the Users page if they're locked out.
+          </p>
+        </div>
+        {% else %}
+        <div class="field-group">
+          <label>Password</label>
+          <input type="text" value="{{ temporary_password }}" disabled aria-label="Temporary password">
+          <p class="helptext">Every new user starts on this temporary password and must choose their own the first time they sign in.</p>
+        </div>
+        {% endif %}
+      </div>
+    </form>
+
+    <div class="enroll-footer">
+      <a href="{{ cancel_url }}" class="btn btn-outline">Cancel</a>
+      <button type="submit" form="enroll-form" class="btn btn-accent">{% if editing %}Save changes{% else %}Enroll User{% endif %}</button>
+    </div>
+  </div>
+
+  <aside class="card">
+    <div class="how-card-header">
+      <span class="how-card-icon">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9">
+          <rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+        </svg>
+      </span>
+      <h2>{% if editing %}Reminder{% else %}How access works{% endif %}</h2>
+    </div>
+    {% if editing %}
+    <ol class="how-list">
+      <li><span class="how-step">1</span><span><strong>Changing the username</strong> takes effect immediately — the old one stops working, so pass the new one along.</span></li>
+      <li><span class="how-step">2</span><span><strong>Changing the company</strong> moves them right away: they'll see the new company's data and lose access to the old one.</span></li>
+      <li><span class="how-step">3</span><span><strong>The password stays as it is.</strong> Use <em>Reset password</em> on the Users page to put them back on the temporary one.</span></li>
+    </ol>
+    {% else %}
+    <ol class="how-list">
+      <li><span class="how-step">1</span><span><strong>Pick the transporter.</strong> The user is tied to that one company — you can enroll as many users as you like under the same company.</span></li>
+      <li><span class="how-step">2</span><span><strong>They sign in with <code>{{ temporary_password }}</code>.</strong> Passing them the username is up to you — it's shown once you enroll them, and stays on the Users page.</span></li>
+      <li><span class="how-step">3</span><span><strong>They're forced to set a new password</strong> before they can see anything else.</span></li>
+      <li><span class="how-step">4</span><span><strong>They only see their own company.</strong> Trucks, drivers, transits and waybills of any other transporter are out of reach.</span></li>
+    </ol>
+    {% endif %}
+  </aside>
+
+</div>
+{% endblock %}

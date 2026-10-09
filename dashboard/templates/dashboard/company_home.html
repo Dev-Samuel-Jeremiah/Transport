@@ -1,0 +1,1011 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · {{ company.name }}{% endblock %}
+
+{% block content %}
+<style>
+  :root {
+    --dash-bg: #f4f7fb;
+    --surface: rgba(255, 255, 255, 0.86);
+    --surface-solid: #ffffff;
+    --ink: #13213a;
+    --muted: #72809a;
+    --line: #e6ebf2;
+    --primary: #3158e8;
+    --primary-dark: #1d3db7;
+    --primary-soft: #eef2ff;
+    --teal: #12a594;
+    --amber: #f59e0b;
+    --danger: #ef476f;
+    --shadow: 0 16px 45px rgba(26, 42, 74, 0.08);
+    --shadow-hover: 0 24px 45px rgba(34, 56, 101, 0.14);
+  }
+
+  .company-dashboard {
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: 12px 0 48px;
+    color: var(--ink);
+  }
+
+  .company-dashboard *,
+  .company-dashboard *::before,
+  .company-dashboard *::after {
+    box-sizing: border-box;
+  }
+
+  /* Hero */
+  .dashboard-hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px;
+    overflow: hidden;
+    min-height: 235px;
+    margin-bottom: 26px;
+    padding: 38px 42px;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 25px;
+    background:
+      radial-gradient(circle at 83% 20%, rgba(123, 149, 255, 0.62) 0%, transparent 23%),
+      radial-gradient(circle at 92% 92%, rgba(24, 214, 183, 0.28) 0%, transparent 25%),
+      linear-gradient(120deg, #111e4b 0%, #263fba 53%, #4268ee 100%);
+    box-shadow: 0 20px 48px rgba(33, 61, 174, 0.2);
+    color: #fff;
+  }
+
+  .dashboard-hero::before,
+  .dashboard-hero::after {
+    position: absolute;
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    border-radius: 50%;
+    content: "";
+    pointer-events: none;
+  }
+
+  .dashboard-hero::before {
+    width: 430px;
+    height: 430px;
+    top: -270px;
+    right: 7%;
+  }
+
+  .dashboard-hero::after {
+    width: 270px;
+    height: 270px;
+    right: -65px;
+    bottom: -160px;
+  }
+
+  .dashboard-hero-content,
+  .dashboard-hero-actions {
+    position: relative;
+    z-index: 1;
+  }
+
+  .dashboard-hero-content {
+    max-width: 700px;
+  }
+
+  .dashboard-hero .page-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 13px;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.71rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .dashboard-hero .page-eyebrow::before {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #52e8c6;
+    box-shadow: 0 0 0 5px rgba(82, 232, 198, 0.18);
+    content: "";
+  }
+
+  .dashboard-hero .page-title {
+    margin: 0;
+    color: #fff;
+    font-size: clamp(2rem, 4vw, 3.1rem);
+    font-weight: 800;
+    letter-spacing: -0.055em;
+    line-height: 1;
+  }
+
+  .dashboard-hero .page-subtitle {
+    max-width: 600px;
+    margin: 16px 0 0;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.96rem;
+    line-height: 1.7;
+  }
+
+  .dashboard-hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .hero-live-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 13px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 10px;
+    background: rgba(5, 16, 61, 0.2);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.74rem;
+    font-weight: 700;
+  }
+
+  .hero-live-status span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #4df0be;
+    box-shadow: 0 0 0 5px rgba(77, 240, 190, 0.16);
+    animation: dashboard-pulse 2s infinite;
+  }
+
+  .dashboard-hero .btn-accent {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 45px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: 11px;
+    background: #fff;
+    box-shadow: 0 10px 25px rgba(10, 22, 80, 0.22);
+    color: #2445c9;
+    font-weight: 800;
+    text-decoration: none;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+  }
+
+  .dashboard-hero .btn-accent:hover {
+    box-shadow: 0 15px 30px rgba(10, 22, 80, 0.3);
+    color: #1937b5;
+    transform: translateY(-3px);
+  }
+
+  /* Metrics */
+  .dashboard-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 17px;
+    margin-bottom: 28px;
+  }
+
+  .dashboard-stat-card {
+    position: relative;
+    display: block;
+    min-height: 152px;
+    overflow: hidden;
+    padding: 22px;
+    border: 1px solid var(--line);
+    border-radius: 19px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    animation: dashboard-enter 0.55s ease both;
+  }
+
+  .dashboard-stat-card:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  .dashboard-stat-card:nth-child(2) { animation-delay: 0.06s; }
+  .dashboard-stat-card:nth-child(3) { animation-delay: 0.12s; }
+  .dashboard-stat-card:nth-child(4) { animation-delay: 0.18s; }
+  .dashboard-stat-card:nth-child(5) { animation-delay: 0.24s; }
+
+  .dashboard-stat-card:hover {
+    border-color: #cfd8ff;
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-5px);
+  }
+
+  .dashboard-stat-card::after {
+    position: absolute;
+    width: 85px;
+    height: 85px;
+    right: -26px;
+    bottom: -35px;
+    border-radius: 50%;
+    background: var(--primary-soft);
+    content: "";
+  }
+
+  .dashboard-stat-card.accent-stat {
+    border-color: #c9d5ff;
+    background: linear-gradient(135deg, #ffffff 0%, #f1f4ff 100%);
+  }
+
+  .dashboard-stat-card.accent-stat::after {
+    background: #d8e2ff;
+  }
+
+  .dashboard-stat-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .dashboard-stat-label {
+    color: var(--muted);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+
+  .dashboard-stat-icon {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border-radius: 10px;
+    background: #edf1ff;
+    color: var(--primary);
+  }
+
+  .dashboard-stat-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .dashboard-stat-value {
+    position: relative;
+    z-index: 1;
+    margin-top: 19px;
+    color: var(--ink);
+    font-size: clamp(1.7rem, 2.4vw, 2.25rem);
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    line-height: 1;
+  }
+
+  .dashboard-stat-note {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 11px;
+    color: #8692a8;
+    font-size: 0.73rem;
+  }
+
+  .dashboard-stat-note .positive {
+    color: var(--teal);
+    font-weight: 800;
+  }
+
+  .dashboard-stat-card.accent-stat .dashboard-stat-value {
+    color: var(--primary);
+  }
+
+  /* Main layout */
+  .dashboard-content-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.18fr) minmax(370px, 0.82fr);
+    gap: 26px;
+    align-items: start;
+  }
+
+  .dashboard-section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 15px;
+  }
+
+  .dashboard-section-heading {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  .dashboard-section-description {
+    margin: 5px 0 0;
+    color: var(--muted);
+    font-size: 0.84rem;
+  }
+
+  /* Transit cards */
+  .transit-list {
+    display: grid;
+    gap: 13px;
+  }
+
+  .dashboard-transit-card {
+    position: relative;
+    overflow: hidden;
+    padding: 20px 21px;
+    border: 1px solid var(--line);
+    border-radius: 17px;
+    background: var(--surface-solid);
+    box-shadow: 0 7px 20px rgba(30, 48, 85, 0.045);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+
+  .dashboard-transit-card::before {
+    position: absolute;
+    top: 18px;
+    bottom: 18px;
+    left: 0;
+    width: 4px;
+    border-radius: 0 4px 4px 0;
+    background: var(--primary);
+    content: "";
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+
+  .dashboard-transit-card:hover {
+    border-color: #cfd8ff;
+    box-shadow: var(--shadow-hover);
+    transform: translateX(4px);
+  }
+
+  .dashboard-transit-card:hover::before {
+    opacity: 1;
+  }
+
+  .dashboard-transit-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .dashboard-transit-code {
+    color: var(--primary);
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+  }
+
+  .dashboard-transit-code:hover {
+    color: var(--primary-dark);
+  }
+
+  .dashboard-transit-route {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin: 18px 0 16px;
+    color: var(--ink);
+    font-size: 1rem;
+    font-weight: 750;
+    line-height: 1.4;
+  }
+
+  .route-place {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .route-line {
+    position: relative;
+    width: 35px;
+    height: 1px;
+    flex: 0 0 35px;
+    background: #aebcf1;
+  }
+
+  .route-line::after {
+    position: absolute;
+    top: -3px;
+    right: 0;
+    width: 7px;
+    height: 7px;
+    border-top: 1px solid var(--primary);
+    border-right: 1px solid var(--primary);
+    content: "";
+    transform: rotate(45deg);
+  }
+
+  .dashboard-transit-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 14px;
+    border-top: 1px solid #edf0f5;
+  }
+
+  .dashboard-transit-meta span {
+    padding: 6px 9px;
+    border-radius: 7px;
+    background: #f6f8fb;
+    color: var(--muted);
+    font-size: 0.73rem;
+  }
+
+  .dashboard-transit-meta strong {
+    margin-left: 3px;
+    color: #44526a;
+    font-weight: 750;
+  }
+
+  .dashboard-view-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 17px;
+    color: var(--primary);
+    font-size: 0.82rem;
+    font-weight: 800;
+    text-decoration: none;
+    transition: gap 0.2s ease;
+  }
+
+  .dashboard-view-all:hover {
+    gap: 11px;
+    color: var(--primary-dark);
+  }
+
+  /* Right panels */
+  .dashboard-stack {
+    display: grid;
+    gap: 24px;
+  }
+
+  .dashboard-panel {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 19px;
+    background: var(--surface-solid);
+    box-shadow: var(--shadow);
+  }
+
+  .dashboard-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 19px 21px;
+    border-bottom: 1px solid #edf0f4;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+  }
+
+  .dashboard-panel-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .dashboard-panel-heading-icon {
+    display: grid;
+    width: 31px;
+    height: 31px;
+    place-items: center;
+    border-radius: 9px;
+    background: var(--primary-soft);
+    color: var(--primary);
+  }
+
+  .dashboard-panel-heading-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .dashboard-panel-header h2 {
+    margin: 0;
+    color: var(--ink);
+    font-size: 0.97rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .dashboard-panel-header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .dashboard-panel-header-actions .btn,
+  .dashboard-panel-body .btn {
+    border-radius: 8px;
+    font-size: 0.74rem;
+    font-weight: 750;
+  }
+
+  .dashboard-panel-body {
+    padding: 18px 21px 20px;
+  }
+
+  /* Tables */
+  .dashboard-mini-table-wrap {
+    margin-top: 17px;
+    overflow-x: auto;
+  }
+
+  .dashboard-mini-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .dashboard-mini-table th {
+    padding: 9px 8px 11px;
+    border-bottom: 1px solid #e9edf3;
+    color: #96a1b4;
+    font-size: 0.64rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .dashboard-mini-table td {
+    padding: 12px 8px;
+    border-bottom: 1px solid #f0f2f6;
+    color: #526078;
+    font-size: 0.77rem;
+    vertical-align: middle;
+  }
+
+  .dashboard-mini-table tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .dashboard-mini-table tbody tr {
+    transition: background 0.18s ease;
+  }
+
+  .dashboard-mini-table tbody tr:hover {
+    background: #f8faff;
+  }
+
+  .dashboard-mini-table a {
+    color: #294bc4;
+    font-weight: 800;
+    text-decoration: none;
+  }
+
+  .dashboard-mini-table a:hover {
+    color: var(--primary-dark);
+  }
+
+  .dashboard-panel-empty {
+    margin: 0;
+    padding: 12px 0;
+    color: var(--muted);
+    font-size: 0.84rem;
+  }
+
+  .dashboard-fleet-location {
+    max-width: 175px;
+    overflow: hidden;
+    color: var(--muted);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Compatible badge improvements */
+  .company-dashboard .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 23px;
+    padding: 4px 8px;
+    border-radius: 99px;
+    font-size: 0.67rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0.01em;
+  }
+
+  .company-dashboard .badge-info {
+    background: #e8edff;
+    color: #3655c7;
+  }
+
+  .company-dashboard .badge-ok {
+    background: #e1f8f1;
+    color: #078c78;
+  }
+
+  .company-dashboard .badge-warn {
+    background: #fff4dd;
+    color: #b87600;
+  }
+
+  .company-dashboard .badge-neutral {
+    background: #edf0f4;
+    color: #68758a;
+  }
+
+  .dashboard-empty-state {
+    padding: 48px 25px;
+    border: 1px dashed #cbd5e9;
+    border-radius: 17px;
+    background: linear-gradient(135deg, #fcfdff, #f5f8ff);
+    text-align: center;
+  }
+
+  .dashboard-empty-icon {
+    display: grid;
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 15px;
+    place-items: center;
+    border-radius: 15px;
+    background: #e9eeff;
+    color: var(--primary);
+    font-size: 1.35rem;
+  }
+
+  .dashboard-empty-state h3 {
+    margin: 0 0 7px;
+    color: var(--ink);
+    font-size: 1rem;
+  }
+
+  .dashboard-empty-state p {
+    margin: 0 0 18px;
+    color: var(--muted);
+    font-size: 0.84rem;
+  }
+
+  @keyframes dashboard-enter {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes dashboard-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+  }
+
+  @media (max-width: 1200px) {
+    .dashboard-stat-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .dashboard-content-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .company-dashboard {
+      padding-top: 4px;
+    }
+
+    .dashboard-hero {
+      align-items: flex-start;
+      flex-direction: column;
+      min-height: auto;
+      padding: 29px 24px;
+      border-radius: 20px;
+    }
+
+    .dashboard-hero-actions {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .dashboard-stat-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .dashboard-stat-card {
+      min-height: 135px;
+      padding: 17px;
+    }
+  }
+
+  @media (max-width: 500px) {
+    .dashboard-hero-actions {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .dashboard-hero .btn-accent {
+      width: 100%;
+    }
+
+    .hero-live-status {
+      justify-content: center;
+    }
+
+    .dashboard-stat-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .dashboard-section-header,
+    .dashboard-panel-header {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .dashboard-panel-header-actions {
+      width: 100%;
+    }
+
+    .dashboard-panel-header-actions .btn {
+      flex: 1;
+      text-align: center;
+    }
+
+    .dashboard-panel-body {
+      padding: 16px;
+    }
+
+    .dashboard-transit-route {
+      font-size: 0.9rem;
+    }
+  }
+</style>
+
+<div class="company-dashboard">
+
+  <section class="dashboard-hero">
+    <div class="dashboard-hero-content">
+      <p class="page-eyebrow">{{ company.name }}</p>
+      <h1 class="page-title">Logistics Command Center</h1>
+      <p class="page-subtitle">
+        Get a complete view of your fleet, shipments, waybills, and daily delivery operations in one intelligent workspace.
+      </p>
+    </div>
+
+    <div class="dashboard-hero-actions">
+      <div class="hero-live-status">
+        <span></span>
+        Operations live
+      </div>
+    </div>
+  </section>
+
+  <section class="dashboard-stat-grid" aria-label="Company summary">
+
+    <a class="dashboard-stat-card" href="{% url 'transit:company_list' %}?status=PENDING">
+      <div class="dashboard-stat-top">
+        <span class="dashboard-stat-label">Open transits</span>
+        <span class="dashboard-stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+            <path d="M4 18V6M20 18V6M4 8h10l2 3h4"/>
+            <circle cx="4" cy="19" r="1.5"/><circle cx="20" cy="19" r="1.5"/>
+          </svg>
+        </span>
+      </div>
+      <div class="dashboard-stat-value">{{ pending_transits }}</div>
+      <div class="dashboard-stat-note"><span class="positive">●</span> Awaiting completion</div>
+    </a>
+
+    <a class="dashboard-stat-card" href="{% url 'waybills:company_waybill_list' %}">
+      <div class="dashboard-stat-top">
+        <span class="dashboard-stat-label">Waybills</span>
+        <span class="dashboard-stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+            <path d="M6 3h9l4 4v14H6z"/>
+            <path d="M15 3v5h5M9 13h6M9 17h6"/>
+          </svg>
+        </span>
+      </div>
+      <div class="dashboard-stat-value">{{ waybill_count }}</div>
+      <div class="dashboard-stat-note">Documents recorded</div>
+    </a>
+
+    <a class="dashboard-stat-card accent-stat" href="{% url 'transit:company_delivered' %}">
+      <div class="dashboard-stat-top">
+        <span class="dashboard-stat-label">Delivered</span>
+        <span class="dashboard-stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+            <path d="M5 12l4 4L19 6"/>
+          </svg>
+        </span>
+      </div>
+      <div class="dashboard-stat-value">{{ delivered_count }}</div>
+      <div class="dashboard-stat-note"><span class="positive">↑</span> {% if delivered_this_month %}{{ delivered_this_month }} this month{% else %}Completed deliveries{% endif %}</div>
+    </a>
+
+  </section>
+
+  <div class="dashboard-content-grid">
+
+    <section>
+      <div class="dashboard-section-header">
+        <div>
+          <h2 class="dashboard-section-heading">Active Transits</h2>
+          <p class="dashboard-section-description">Shipments currently moving through your delivery network.</p>
+        </div>
+      </div>
+
+      {% if active_transits %}
+        <div class="transit-list">
+          {% for t in active_transits %}
+            <article class="dashboard-transit-card">
+              <div class="dashboard-transit-top">
+                <a class="dashboard-transit-code mono" href="{% url 'transit:company_detail' t.pk %}">
+                  {{ t.reference_code }}
+                </a>
+                <span class="badge badge-info">{{ t.get_status_display }}</span>
+              </div>
+
+              <div class="dashboard-transit-route">
+                <span class="route-place">{{ t.origin }}</span>
+                <span class="route-line"></span>
+                <span class="route-place">{{ t.destination }}</span>
+              </div>
+
+              <div class="dashboard-transit-meta">
+                <span>Truck <strong class="mono">{{ t.truck.registration_number }}</strong></span>
+                {% if t.driver %}
+                  <span>Driver <strong>{{ t.driver.full_name }}</strong></span>
+                {% endif %}
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="dashboard-empty-state">
+          <div class="dashboard-empty-icon">🚚</div>
+          <h3>No active transits</h3>
+          <p>A transit appears here on its own once one of your trucks has a saved route and is marked on trip.</p>
+          <a href="{% url 'trucks:company_list' %}" class="btn btn-primary btn-sm">
+            Go to Trucks
+          </a>
+        </div>
+      {% endif %}
+
+      <a href="{% url 'transit:company_list' %}" class="dashboard-view-all">
+        View all transits <span>→</span>
+      </a>
+    </section>
+
+    <div class="dashboard-stack">
+
+      <section class="dashboard-panel">
+        <div class="dashboard-panel-header">
+          <div class="dashboard-panel-heading">
+            <span class="dashboard-panel-heading-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                <path d="M6 3h9l4 4v14H6z"/>
+                <path d="M15 3v5h5M9 13h6M9 17h6"/>
+              </svg>
+            </span>
+            <h2>Waybills</h2>
+          </div>
+
+          <div class="dashboard-panel-header-actions">
+            <a href="{% url 'waybills:company_waybill_list' %}" class="btn btn-outline btn-sm">View all</a>
+          </div>
+        </div>
+
+        <div class="dashboard-panel-body">
+          {% if recent_waybills %}
+            <div class="dashboard-mini-table-wrap">
+              <table class="dashboard-mini-table">
+                <thead>
+                  <tr>
+                    <th>Waybill</th>
+                    <th>Route</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for w in recent_waybills %}
+                    <tr>
+                      <td class="mono"><strong>{{ w.waybill_number }}</strong></td>
+                      <td class="text-muted">{{ w.origin }} → {{ w.destination }}</td>
+                      <td>
+                        {% if w.status == 'OFFLOADED' %}
+                          <span class="badge badge-ok">Offloaded</span>
+                        {% elif w.status == 'IN_TRANSIT' %}
+                          <span class="badge badge-info">In Transit</span>
+                        {% elif w.status == 'CANCELLED' %}
+                          <span class="badge badge-neutral">Cancelled</span>
+                        {% else %}
+                          <span class="badge badge-warn">Pending</span>
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <p class="dashboard-panel-empty">No waybills yet. Upload a transit sheet or add one manually.</p>
+          {% endif %}
+        </div>
+      </section>
+
+      <section class="dashboard-panel">
+        <div class="dashboard-panel-header">
+          <div class="dashboard-panel-heading">
+            <span class="dashboard-panel-heading-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                <path d="M3 5h11v11H3zM14 9h4l3 3v4h-7z"/>
+                <circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>
+              </svg>
+            </span>
+            <h2>Your Fleet</h2>
+          </div>
+
+          <div class="dashboard-panel-header-actions">
+            <a href="{% url 'trucks:company_create' %}" class="btn btn-outline btn-sm">+ Add Truck</a>
+          </div>
+        </div>
+
+        <div class="dashboard-panel-body">
+          {% if trucks %}
+            <div class="dashboard-mini-table-wrap" style="margin-top: 0;">
+              <table class="dashboard-mini-table">
+                <thead>
+                  <tr>
+                    <th>Registration</th>
+                    <th>Status</th>
+                    <th>Last location</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for truck in trucks %}
+                    <tr>
+                      <td>
+                        <a class="mono" href="{% url 'trucks:company_detail' truck.pk %}">
+                          {{ truck.registration_number }}
+                        </a>
+                      </td>
+                      <td>
+                        {% if truck.status == 'AVAILABLE' %}
+                          <span class="badge badge-ok">Available</span>
+                        {% elif truck.status == 'ON_TRIP' %}
+                          <span class="badge badge-info">On Trip</span>
+                        {% elif truck.status == 'MAINTENANCE' %}
+                          <span class="badge badge-warn">Maintenance</span>
+                        {% else %}
+                          <span class="badge badge-neutral">Inactive</span>
+                        {% endif %}
+                      </td>
+                      <td class="dashboard-fleet-location" title="{{ truck.last_known_location|default:'No location yet' }}">
+                        {{ truck.last_known_location|default:"No location yet" }}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <p class="dashboard-panel-empty">No trucks added yet.</p>
+          {% endif %}
+
+          <a href="{% url 'trucks:company_list' %}" class="dashboard-view-all">
+            Manage fleet <span>→</span>
+          </a>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

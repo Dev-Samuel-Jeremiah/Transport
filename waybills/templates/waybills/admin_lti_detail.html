@@ -1,0 +1,424 @@
+{% extends "base.html" %}
+{% block title %}{{ lti.lti_number }} · Freightline{% endblock %}
+
+{% block content %}
+
+<style>
+  .lti-page {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 8px 0 32px;
+  }
+
+  .lti-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 28px 30px;
+    margin-bottom: 24px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 16px;
+    background:
+      radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 34%),
+      linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+  }
+
+  .lti-hero-content {
+    min-width: 0;
+  }
+
+  .lti-hero .page-eyebrow {
+    margin: 0 0 8px;
+    color: var(--primary-color, #2563eb);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .lti-hero .page-title {
+    margin: 0;
+    color: #0f172a;
+    font-size: clamp(1.65rem, 3vw, 2.25rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+  }
+
+  .lti-hero .page-subtitle {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 7px;
+    margin: 12px 0 0;
+    color: #64748b;
+    font-size: 0.95rem;
+  }
+
+  .lti-hero .page-subtitle a {
+    color: #1d4ed8;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .lti-hero .page-subtitle a:hover {
+    text-decoration: underline;
+  }
+
+  .lti-status-card {
+    flex-shrink: 0;
+    min-width: 150px;
+    padding: 14px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  .lti-status-card small {
+    display: block;
+    margin-bottom: 7px;
+    color: #94a3b8;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .lti-status-card .badge {
+    font-size: 0.8rem;
+  }
+
+  .lti-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .lti-summary-card {
+    padding: 18px 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.035);
+  }
+
+  .lti-summary-card-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #94a3b8;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .lti-summary-card-value {
+    color: #0f172a;
+    font-size: 1.05rem;
+    font-weight: 750;
+  }
+
+  .lti-summary-card-value.large {
+    font-size: 1.6rem;
+    line-height: 1;
+  }
+
+  .lti-waybills-section {
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.045);
+  }
+
+  .lti-waybills-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #fcfdff;
+  }
+
+  .lti-waybills-header h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1rem;
+    font-weight: 800;
+  }
+
+  .lti-waybills-header p {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 0.85rem;
+  }
+
+  .waybill-count {
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 0.78rem;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .lti-waybills-section .table-wrap {
+    margin: 0;
+    overflow-x: auto;
+  }
+
+  .lti-waybills-section table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .lti-waybills-section thead {
+    background: #f8fafc;
+  }
+
+  .lti-waybills-section th {
+    padding: 10px 12px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #64748b;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.065em;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .lti-waybills-section td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eef2f7;
+    color: #334155;
+    font-size: 0.9rem;
+    vertical-align: middle;
+  }
+
+  .lti-waybills-section tbody tr {
+    transition: background 0.18s ease;
+  }
+
+  .lti-waybills-section tbody tr:hover {
+    background: #f8fbff;
+  }
+
+  .lti-waybills-section tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .waybill-number {
+    color: #0f172a;
+    font-weight: 800;
+  }
+
+  .route-cell {
+    white-space: nowrap;
+  }
+
+  .weight-cell {
+    color: #0f172a;
+    font-weight: 700;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .empty-state {
+    padding: 52px 24px;
+    text-align: center;
+  }
+
+  .empty-state-icon {
+    display: grid;
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 14px;
+    place-items: center;
+    border-radius: 14px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 1.35rem;
+  }
+
+  .empty-state h3 {
+    margin: 0 0 6px;
+    color: #0f172a;
+    font-size: 1rem;
+  }
+
+  .empty-state p {
+    margin: 0;
+    color: #64748b;
+  }
+
+  @media (max-width: 760px) {
+    .lti-page {
+      padding-top: 0;
+    }
+
+    .lti-hero {
+      flex-direction: column;
+      padding: 22px 20px;
+    }
+
+    .lti-status-card {
+      width: 100%;
+    }
+
+    .lti-summary-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .lti-waybills-header {
+      align-items: flex-start;
+      flex-direction: column;
+      padding: 18px 20px;
+    }
+  }
+</style>
+
+<div class="lti-page">
+
+  <section class="lti-hero">
+    <div class="lti-hero-content">
+      <p class="page-eyebrow">Network · LTI Overview</p>
+
+      <h1 class="page-title mono">{{ lti.lti_number }}</h1>
+
+      <p class="page-subtitle">
+        <a href="{% url 'companies:detail' lti.company_id %}">
+          {{ lti.company.name }}
+        </a>
+        <span>•</span>
+        <span>STO: <strong>{{ lti.sto|default:"—" }}</strong></span>
+      </p>
+    </div>
+
+    <div class="lti-status-card">
+      <small>LTI Status</small>
+      {% if lti.status == 'OPEN' %}
+        <span class="badge badge-ok">Open</span>
+      {% else %}
+        <span class="badge badge-neutral">Closed</span>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="lti-summary-grid">
+    <div class="lti-summary-card">
+      <span class="lti-summary-card-label">Waybills</span>
+      <div class="lti-summary-card-value large">{{ waybills|length }}</div>
+    </div>
+
+    <div class="lti-summary-card">
+      <span class="lti-summary-card-label">Company</span>
+      <div class="lti-summary-card-value">{{ lti.company.name }}</div>
+    </div>
+
+    <div class="lti-summary-card">
+      <span class="lti-summary-card-label">STO Reference</span>
+      <div class="lti-summary-card-value mono">{{ lti.sto|default:"—" }}</div>
+    </div>
+  </section>
+
+  <section class="lti-waybills-section">
+    <div class="lti-waybills-header">
+      <div>
+        <h2>Waybills</h2>
+        <p>Track all shipments assigned to this LTI.</p>
+      </div>
+
+      <span class="waybill-count">
+        {{ waybills|length }} waybill{{ waybills|length|pluralize }}
+      </span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Waybill No.</th>
+            <th>Date</th>
+            <th>Origin</th>
+            <th>Destination</th>
+            <th>Vehicle</th>
+            <th>Driver</th>
+            <th>Commodity</th>
+            <th style="text-align: right;">MT</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for w in waybills %}
+          <tr>
+            <td class="mono">
+              <strong class="waybill-number">{{ w.waybill_number }}</strong>
+            </td>
+
+            <td class="text-muted">
+              {{ w.date|default:"—" }}
+            </td>
+
+            <td class="text-muted route-cell">
+              {{ w.origin }}
+            </td>
+
+            <td class="text-muted route-cell">
+              {{ w.destination }}
+            </td>
+
+            <td class="text-muted">
+              {{ w.truck.registration_number|default:w.vehicle_id|default:"—" }}
+            </td>
+
+            <td class="text-muted">
+              {{ w.driver.full_name|default:w.driver_name|default:"—" }}
+            </td>
+
+            <td class="text-muted cell-wrap">
+              {{ w.commodity|default:"—" }}
+            </td>
+
+            <td class="weight-cell">
+              {{ w.weight_mt|default:"—" }}
+            </td>
+
+            <td>
+              {% if w.status == 'OFFLOADED' %}
+                <span class="badge badge-ok">Offloaded</span>
+              {% elif w.status == 'IN_TRANSIT' %}
+                <span class="badge badge-info">In Transit</span>
+              {% elif w.status == 'CANCELLED' %}
+                <span class="badge badge-neutral">Cancelled</span>
+              {% else %}
+                <span class="badge badge-warn">Pending</span>
+              {% endif %}
+            </td>
+          </tr>
+
+          {% empty %}
+          <tr>
+            <td colspan="9">
+              <div class="empty-state">
+                <div class="empty-state-icon">📦</div>
+                <h3>No waybills yet</h3>
+                <p>No waybills have been assigned to this LTI.</p>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+{% endblock %}

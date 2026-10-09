@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Audit · Freightline{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <p class="page-eyebrow">Network</p>
+    <h1 class="page-title">Transit Audit Log</h1>
+    <p class="page-subtitle">Delivered transits confirmed out of the active register, kept here for record-keeping.</p>
+  </div>
+  <div class="page-header-actions">
+    <a href="{% url 'transit:admin_delivered_export' %}?format=xlsx&{{ request.GET.urlencode }}" class="btn btn-outline">
+      Download Excel
+    </a>
+    <a href="{% url 'transit:admin_delivered_export' %}?format=csv&{{ request.GET.urlencode }}" class="btn btn-outline">
+      Download CSV
+    </a>
+    <a href="{% url 'transit:admin_list' %}" class="btn btn-outline">← Back to Transits</a>
+  </div>
+</div>
+
+<style>
+  .page-header-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+  .page-header-actions .btn { white-space: nowrap; }
+</style>
+
+<p class="page-subtitle" style="margin:-8px 0 18px;">
+  The downloads cover <strong>every delivered transit across all companies</strong> — both
+  those already confirmed into this log and those still awaiting confirmation.
+</p>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Reference</th><th>Company</th><th>Route</th><th>Truck</th><th>Status</th><th>Confirmed</th><th>Confirmed by</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in transits %}
+      <tr>
+        <td><a class="mono" href="{% url 'transit:admin_detail' t.pk %}">{{ t.reference_code }}</a></td>
+        <td><a href="{% url 'companies:detail' t.company.pk %}">{{ t.company.name }}</a></td>
+        <td>{{ t.origin }} → {{ t.destination }}</td>
+        <td class="mono">{{ t.truck.registration_number }}</td>
+        <td><span class="badge badge-ok">{{ t.get_status_display }}</span></td>
+        <td class="mono text-muted">{{ t.archived_at|date:"d M Y, H:i" }}</td>
+        <td class="text-muted">{{ t.archived_by.username|default:"—" }}</td>
+        <td>
+          <form method="post" action="{% url 'transit:admin_restore' t.pk %}"
+                onsubmit="return confirm('Send {{ t.reference_code }} back to the active Transits register?');">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button type="submit" class="btn btn-outline btn-sm">Restore</button>
+          </form>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="8"><div class="empty-state"><p>No transits have been moved to audit yet.</p></div></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if is_paginated %}
+<div class="mt-24">
+  {% if page_obj.has_previous %}<a class="btn btn-outline btn-sm" href="?page={{ page_obj.previous_page_number }}">← Prev</a>{% endif %}
+  <span class="text-muted" style="margin:0 8px;">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a class="btn btn-outline btn-sm" href="?page={{ page_obj.next_page_number }}">Next →</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

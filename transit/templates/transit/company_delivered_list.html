@@ -1,0 +1,487 @@
+{% extends "base.html" %}
+{% block title %}Delivered · Freightline{% endblock %}
+
+{% block content %}
+
+<style>
+  .delivered-page {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 8px 0 32px;
+  }
+
+  .delivered-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 28px 30px;
+    margin-bottom: 24px;
+    border-radius: 18px;
+    color: #ffffff;
+    background:
+      radial-gradient(circle at top right, rgba(255, 255, 255, 0.16), transparent 42%),
+      linear-gradient(120deg, #064e3b 0%, #047857 45%, #10b981 100%);
+    box-shadow: 0 14px 34px rgba(4, 120, 87, 0.22);
+  }
+
+  .delivered-hero .page-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 10px;
+    font-size: 0.73rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.82);
+  }
+
+  .delivered-hero .page-eyebrow::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #6ee7b7;
+    box-shadow: 0 0 0 4px rgba(110, 231, 183, 0.25);
+  }
+
+  .delivered-hero .page-title {
+    margin: 0;
+    font-size: clamp(1.7rem, 3vw, 2.4rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+  }
+
+  .delivered-hero .page-subtitle {
+    max-width: 560px;
+    margin: 10px 0 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.86);
+  }
+
+  .delivered-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+    max-width: 260px;
+  }
+
+  .delivered-hero-actions a {
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: #ffffff;
+  }
+
+  .delivered-hero-actions a.solid {
+    background: #ffffff;
+    color: #047857;
+    border-color: #ffffff;
+  }
+
+  .delivered-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .delivered-stat {
+    padding: 20px 22px;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+  }
+
+  .delivered-stat-label {
+    display: block;
+    color: #64748b;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .delivered-stat-value {
+    margin-top: 10px;
+    color: #0f172a;
+    font-size: 1.9rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  .delivered-stat-note {
+    margin-top: 4px;
+    color: #94a3b8;
+    font-size: 0.8rem;
+  }
+
+  .delivered-filters {
+    padding: 18px 20px;
+    margin-bottom: 24px;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.035);
+  }
+
+  .delivered-filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+  }
+
+  .delivered-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .delivered-field label {
+    color: #64748b;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .delivered-field input,
+  .delivered-field select {
+    min-width: 165px;
+    padding: 8px 11px;
+    border: 1px solid #d8dee9;
+    border-radius: 9px;
+    background: #fff;
+    color: #0f172a;
+    font-size: 0.87rem;
+  }
+
+  .delivered-field input:focus,
+  .delivered-field select:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+  }
+
+  .delivered-table-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+    overflow: hidden;
+  }
+
+  .delivered-table-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 22px;
+    border-bottom: 1px solid #eef2f7;
+  }
+
+  .delivered-table-header h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1.05rem;
+    font-weight: 800;
+  }
+
+  .delivered-table-header p {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 0.85rem;
+  }
+
+  .delivered-record-count {
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #ecfdf5;
+    color: #047857;
+    font-size: 0.78rem;
+    font-weight: 800;
+  }
+
+  .delivered-table-card .arrow {
+    margin: 0 7px;
+    color: #94a3b8;
+  }
+
+  .delivered-ref {
+    font-weight: 700;
+    color: #047857;
+    text-decoration: none;
+  }
+
+  .delivered-ref:hover { text-decoration: underline; }
+
+  .delivered-when {
+    color: #0f172a;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .delivered-when small {
+    display: block;
+    color: #94a3b8;
+    font-weight: 500;
+  }
+
+  .delivered-empty {
+    padding: 56px 24px;
+    text-align: center;
+  }
+
+  .delivered-empty .empty-state-icon {
+    font-size: 2.4rem;
+  }
+
+  .delivered-empty h3 {
+    margin: 12px 0 6px;
+    color: #0f172a;
+    font-size: 1.1rem;
+    font-weight: 800;
+  }
+
+  .delivered-empty p {
+    max-width: 480px;
+    margin: 0 auto 18px;
+    color: #64748b;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .delivered-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 22px;
+  }
+
+  .delivered-pagination-info {
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  @media (max-width: 860px) {
+    .delivered-hero {
+      flex-direction: column;
+    }
+    .delivered-hero-actions {
+      max-width: none;
+      justify-content: flex-start;
+    }
+  }
+</style>
+
+<div class="delivered-page">
+
+  <section class="delivered-hero">
+    <div>
+      <p class="page-eyebrow">Delivery history</p>
+      <h1 class="page-title">Delivered Consignments</h1>
+      <p class="page-subtitle">
+        Every trip your fleet has completed, kept on permanent record — including
+        deliveries already confirmed into the admin audit log.
+      </p>
+    </div>
+
+    <div class="delivered-hero-actions">
+      <a class="solid" href="{% url 'transit:company_delivered_export' %}?format=xlsx&{{ request.GET.urlencode }}">
+        Download Excel
+      </a>
+      <a class="solid" href="{% url 'transit:company_delivered_export' %}?format=csv&{{ request.GET.urlencode }}">
+        Download CSV
+      </a>
+      <a href="{% url 'transit:company_list' %}">Active transits</a>
+      <a href="{% url 'dashboard:company_home' %}">← Dashboard</a>
+    </div>
+  </section>
+
+  <section class="delivered-stat-grid" aria-label="Delivery summary">
+    <div class="delivered-stat">
+      <span class="delivered-stat-label">Total delivered</span>
+      <div class="delivered-stat-value">{{ total_delivered }}</div>
+      <div class="delivered-stat-note">All-time completed trips</div>
+    </div>
+
+    <div class="delivered-stat">
+      <span class="delivered-stat-label">This month</span>
+      <div class="delivered-stat-value">{{ delivered_this_month }}</div>
+      <div class="delivered-stat-note">Completed in {% now "F Y" %}</div>
+    </div>
+
+    <div class="delivered-stat">
+      <span class="delivered-stat-label">Tonnage moved</span>
+      <div class="delivered-stat-value">{% if total_tonnage %}{{ total_tonnage|floatformat:2 }}{% else %}0{% endif %}</div>
+      <div class="delivered-stat-note">Metric tonnes on delivered trips</div>
+    </div>
+
+    <div class="delivered-stat">
+      <span class="delivered-stat-label">Destinations</span>
+      <div class="delivered-stat-value">{{ destinations_served }}</div>
+      <div class="delivered-stat-note">Drop-off points served</div>
+    </div>
+  </section>
+
+  <section class="delivered-filters">
+    <form class="delivered-filter-form" method="get" action="{% url 'transit:company_delivered' %}">
+      <div class="delivered-field">
+        <label for="q">Search</label>
+        <input type="search" id="q" name="q" value="{{ current_filters.q }}"
+               placeholder="Reference, route, truck, driver">
+      </div>
+
+      <div class="delivered-field">
+        <label for="destination">Destination</label>
+        <select id="destination" name="destination">
+          <option value="">All destinations</option>
+          {% for d in destination_choices %}
+            <option value="{{ d }}" {% if d == current_filters.destination %}selected{% endif %}>{{ d }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="delivered-field">
+        <label for="from">Delivered from</label>
+        <input type="date" id="from" name="from" value="{{ current_filters.from }}">
+      </div>
+
+      <div class="delivered-field">
+        <label for="to">Delivered to</label>
+        <input type="date" id="to" name="to" value="{{ current_filters.to }}">
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-sm">Apply</button>
+
+      {% if has_filters %}
+        <a href="{% url 'transit:company_delivered' %}" class="btn btn-outline btn-sm">Reset</a>
+      {% endif %}
+    </form>
+  </section>
+
+  <section class="delivered-table-card">
+    <div class="delivered-table-header">
+      <div>
+        <h2>Delivered Register</h2>
+        <p>Most recently completed first.</p>
+      </div>
+
+      <span class="delivered-record-count">
+        {{ filtered_count }} record{{ filtered_count|pluralize }}
+      </span>
+    </div>
+
+    {% if transits %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Reference</th>
+            <th>Route</th>
+            <th>Truck</th>
+            <th>Driver</th>
+            <th>MT</th>
+            <th>Delivered On</th>
+            <th>Record</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for t in transits %}
+          <tr>
+            <td data-label="Reference">
+              <a class="delivered-ref mono" href="{% url 'transit:company_detail' t.pk %}">
+                {{ t.reference_code }}
+              </a>
+            </td>
+
+            <td data-label="Route">
+              {{ t.origin }}<span class="arrow">→</span>{{ t.destination }}
+            </td>
+
+            <td class="mono" data-label="Truck">{{ t.truck.registration_number }}</td>
+
+            <td data-label="Driver">{{ t.driver.full_name|default:"—" }}</td>
+
+            <td data-label="MT">
+              {% if t.display_weight_mt %}{{ t.display_weight_mt|floatformat:"-2" }} MT{% else %}—{% endif %}
+            </td>
+
+            <td data-label="Delivered On">
+              {% if t.actual_arrival %}
+                <span class="delivered-when">
+                  {{ t.actual_arrival|date:"d M Y" }}
+                  <small>{{ t.actual_arrival|date:"H:i" }}</small>
+                </span>
+              {% else %}
+                <span class="delivered-when">
+                  {{ t.updated_at|date:"d M Y" }}
+                  <small>arrival time not recorded</small>
+                </span>
+              {% endif %}
+            </td>
+
+            <td data-label="Record">
+              {% if t.is_archived %}
+                <span class="badge badge-ok">Confirmed</span>
+              {% else %}
+                <span class="badge badge-neutral">Awaiting confirmation</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="delivered-empty">
+      <div class="empty-state-icon">📦</div>
+      <h3>{% if has_filters %}No deliveries match those filters{% else %}No deliveries recorded yet{% endif %}</h3>
+      <p>
+        {% if has_filters %}
+          Try widening the date range or clearing the search to see your full delivery history.
+        {% else %}
+          A trip lands here the moment its status is set to <strong>Delivered</strong> on the
+          transit register. Nothing is ever removed from this page.
+        {% endif %}
+      </p>
+      {% if has_filters %}
+        <a href="{% url 'transit:company_delivered' %}" class="btn btn-outline btn-sm">Clear filters</a>
+      {% else %}
+        <a href="{% url 'transit:company_list' %}" class="btn btn-primary btn-sm">Go to transit register</a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </section>
+
+  {% if is_paginated %}
+  <nav class="delivered-pagination" aria-label="Delivered pagination">
+    {% if page_obj.has_previous %}
+      <a class="btn btn-outline btn-sm" href="?{{ request.GET.urlencode }}{% if request.GET %}&{% endif %}page={{ page_obj.previous_page_number }}">← Previous</a>
+    {% endif %}
+
+    <span class="delivered-pagination-info">
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+      <a class="btn btn-outline btn-sm" href="?{{ request.GET.urlencode }}{% if request.GET %}&{% endif %}page={{ page_obj.next_page_number }}">Next →</a>
+    {% endif %}
+  </nav>
+  {% endif %}
+
+</div>
+
+{% endblock %}

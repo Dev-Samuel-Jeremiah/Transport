@@ -1,0 +1,8 @@
+Django>=5.2,<5.3
+Pillow>=10.0,<12.0
+
+# Production
+django-environ>=0.11,<0.12
+whitenoise>=6.8,<7.0
+gunicorn>=23.0,<24.0
+psycopg2-binary>=2.9,<3.0

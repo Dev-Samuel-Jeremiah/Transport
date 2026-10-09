@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{% if object %}Edit Company{% else %}Register Company{% endif %} · Freightline{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <p class="page-eyebrow">Network</p>
+    <h1 class="page-title">{% if object %}Edit {{ object.name }}{% else %}Register a New Company{% endif %}</h1>
+    {% if not object %}<p class="page-subtitle">This also creates the login the company will use for their dashboard.</p>{% endif %}
+  </div>
+</div>
+
+<div class="card" style="max-width:640px;">
+  <form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="field-group">
+        <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+        {{ field }}
+        {% if field.help_text %}<p class="helptext">{{ field.help_text }}</p>{% endif %}
+        {% if field.errors %}<ul class="errorlist">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+    {% endfor %}
+    <div class="flex-between">
+      <a href="{% if object %}{% url 'companies:detail' object.pk %}{% else %}{% url 'companies:list' %}{% endif %}" class="btn btn-outline">Cancel</a>
+      <button type="submit" class="btn btn-accent">{% if object %}Save Changes{% else %}Register Company{% endif %}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

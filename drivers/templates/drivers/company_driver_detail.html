@@ -1,0 +1,387 @@
+{% extends "base.html" %}
+{% block title %}{{ driver.full_name }} · Freightline{% endblock %}
+{% block content %}
+<style>
+  .driver-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+
+  .driver-hero-main {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .driver-avatar {
+    display: grid;
+    overflow: hidden;
+    width: 68px;
+    height: 68px;
+    flex: none;
+    place-items: center;
+    border: 1px solid var(--slate-200);
+    border-radius: 16px;
+    background: var(--blue-100);
+    color: var(--blue-500);
+    font-size: 1.4rem;
+    font-weight: 800;
+  }
+
+  .driver-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .driver-hero-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .badge-danger {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
+
+  .driver-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+
+  .info-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--slate-100);
+  }
+
+  .info-card-icon {
+    display: grid;
+    width: 32px;
+    height: 32px;
+    flex: none;
+    place-items: center;
+    border-radius: 9px;
+    background: var(--blue-100);
+    color: var(--blue-500);
+  }
+
+  .info-card-header h2 {
+    margin: 0;
+    color: var(--slate-950);
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .info-card-body {
+    padding: 18px 22px 22px;
+  }
+
+  .info-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--slate-100);
+  }
+
+  .info-row:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .info-row:first-child {
+    padding-top: 0;
+  }
+
+  .info-label {
+    color: var(--slate-500);
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+
+  .info-value {
+    color: var(--slate-800);
+    font-size: 0.88rem;
+    font-weight: 650;
+    text-align: right;
+  }
+
+  .disclosure summary {
+    cursor: pointer;
+    color: var(--blue-500);
+    font-size: 0.83rem;
+    font-weight: 750;
+    list-style: none;
+  }
+
+  .disclosure summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .disclosure summary::before {
+    display: inline-block;
+    margin-right: 6px;
+    content: "›";
+    transition: transform 0.15s ease;
+  }
+
+  .disclosure[open] summary::before {
+    transform: rotate(90deg);
+  }
+
+  .disclosure form {
+    padding-top: 16px;
+    margin-top: 14px;
+    border-top: 1px solid var(--slate-100);
+  }
+
+  .doc-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--slate-100);
+  }
+
+  .doc-row:first-child {
+    padding-top: 0;
+  }
+
+  .doc-row-name {
+    flex: 1;
+    min-width: 0;
+    color: var(--slate-800);
+    font-size: 0.87rem;
+    font-weight: 650;
+  }
+
+  .doc-empty {
+    padding: 18px 0;
+    color: var(--slate-500);
+    font-size: 0.85rem;
+    text-align: center;
+  }
+
+  @media (max-width: 900px) {
+    .driver-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="driver-hero">
+  <div class="driver-hero-main">
+    <div class="driver-avatar">
+      {% if driver.photo %}
+        <img src="{{ driver.photo.url }}" alt="">
+      {% else %}
+        {{ driver.full_name|slice:":1"|upper }}
+      {% endif %}
+    </div>
+    <div>
+      <p class="page-eyebrow">Fleet</p>
+      <h1 class="page-title">{{ driver.full_name }}</h1>
+      <div class="driver-hero-badges">
+        <span class="badge badge-neutral mono">License {{ driver.license_number }}</span>
+        <span class="badge {% if driver.status == 'ACTIVE' %}badge-ok{% elif driver.status == 'ON_TRIP' %}badge-info{% else %}badge-neutral{% endif %}">{{ driver.get_status_display }}</span>
+        {% if driver.license_expired %}<span class="badge badge-danger">License Expired</span>{% endif %}
+        {% if driver.needs_password_change %}<span class="badge badge-warn">Temporary password</span>{% endif %}
+      </div>
+    </div>
+  </div>
+  <a href="{% url 'drivers:company_edit' driver.pk %}" class="btn btn-outline">Edit</a>
+</div>
+
+<div class="driver-grid">
+
+  <section class="card">
+    <div class="info-card-header">
+      <span class="info-card-icon">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9">
+          <circle cx="12" cy="8" r="3.3"/><path d="M5 20c.6-3.5 3-5.3 7-5.3s6.4 1.8 7 5.3"/>
+        </svg>
+      </span>
+      <h2>Driver Details</h2>
+    </div>
+    <div class="info-card-body">
+      <div class="info-row"><span class="info-label">Phone</span><span class="info-value mono">{{ driver.phone }}</span></div>
+      <div class="info-row"><span class="info-label">Email</span><span class="info-value">{{ driver.email|default:"—" }}</span></div>
+      <div class="info-row"><span class="info-label">Address</span><span class="info-value">{{ driver.address|default:"—" }}</span></div>
+      <div class="info-row"><span class="info-label">License expiry</span><span class="info-value mono">{{ driver.license_expiry|default:"—" }}</span></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="info-card-header">
+      <span class="info-card-icon">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9">
+          <path d="M6 3h9l4 4v14H6z"/><path d="M15 3v5h5M9 13h6M9 17h6"/>
+        </svg>
+      </span>
+      <h2>Documents</h2>
+    </div>
+    <div class="info-card-body">
+      {% if documents %}
+        {% for doc in documents %}
+          <div class="doc-row">
+            <span class="doc-row-name">{{ doc.get_doc_type_display }}</span>
+            {% if doc.is_expired %}<span class="badge badge-danger">Expired</span>
+            {% elif doc.is_expiring_soon %}<span class="badge badge-warn">Expiring Soon</span>
+            {% else %}<span class="badge badge-ok">Valid</span>{% endif %}
+            <a href="{{ doc.file.url }}" target="_blank" class="btn btn-outline btn-sm">View</a>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="doc-empty">No documents on file.</p>
+      {% endif %}
+
+      <details class="disclosure">
+        <summary>Upload a document</summary>
+        <form method="post" enctype="multipart/form-data" action="{% url 'drivers:company_document_upload' driver.pk %}">
+          {% csrf_token %}
+          {% for field in document_form %}
+            <div class="field-group">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+            </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-primary btn-sm">Upload</button>
+        </form>
+      </details>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="info-card-header">
+      <span class="info-card-icon">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9">
+          <rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+        </svg>
+      </span>
+      <h2>Login Password</h2>
+    </div>
+
+    <div class="info-card-body">
+      {% if driver.user %}
+        <div class="info-row">
+          <span class="info-label">Username</span>
+          <span class="info-value mono">{{ driver.user.username }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Status</span>
+          <span class="info-value">
+            {% if driver.password_is_temporary %}
+              <span class="badge badge-warn">Still the temporary password</span>
+            {% else %}
+              <span class="badge badge-ok">Password set</span>
+            {% endif %}
+          </span>
+        </div>
+
+        {% if driver.password_is_temporary %}
+          <p class="password-hint">
+            This driver can still sign in with the temporary password
+            <code>{{ temporary_password }}</code> that the administrator issued.
+            Set a real one below and pass it to them.
+          </p>
+        {% else %}
+          <p class="password-hint">
+            Setting a new password signs this driver out of the old one. They can also
+            change it themselves from their own profile.
+          </p>
+        {% endif %}
+
+        <form method="post" action="{% url 'drivers:company_password' driver.pk %}" class="password-form">
+          {% csrf_token %}
+          {% for field in password_form %}
+            <div class="field-group">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+            </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-primary btn-sm">Update password</button>
+        </form>
+
+        <p class="password-note">
+          Changing the password is the only account action available to your company.
+          Creating, renaming or removing a driver login is done by an administrator.
+        </p>
+      {% else %}
+        <p class="doc-empty">
+          No login has been created for this driver yet. Driver logins are issued by an
+          administrator during onboarding.
+        </p>
+      {% endif %}
+    </div>
+  </section>
+
+</div>
+
+<style>
+  .password-hint {
+    margin: 14px 0 4px;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: #475569;
+  }
+
+  .password-hint code {
+    padding: 2px 7px;
+    border-radius: 6px;
+    border: 1px solid #f0cf94;
+    background: #fffaf0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.85em;
+    color: #7c5310;
+  }
+
+  .password-form { margin-top: 14px; }
+
+  .password-form .field-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #475569;
+  }
+
+  .password-form .field-group { margin-bottom: 14px; }
+
+  .password-form input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d9e1ee;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+  }
+
+  .password-form input:focus {
+    outline: none;
+    border-color: #2a78d6;
+    box-shadow: 0 0 0 3px rgba(42, 120, 214, 0.16);
+  }
+
+  .password-note {
+    margin: 16px 0 0;
+    padding-top: 13px;
+    border-top: 1px solid #e8edf4;
+    font-size: 0.78rem;
+    line-height: 1.55;
+    color: #94a3b8;
+  }
+</style>
+{% endblock %}

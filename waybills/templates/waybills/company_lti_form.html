@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+{% block title %}New LTI · Freightline{% endblock %}
+
+{% block content %}
+
+<style>
+  .new-lti-page {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 8px 0 36px;
+  }
+
+  .new-lti-hero {
+    padding: 28px 30px;
+    margin-bottom: 24px;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background:
+      radial-gradient(circle at top right, rgba(37, 99, 235, 0.09), transparent 36%),
+      linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+  }
+
+  .new-lti-hero .page-eyebrow {
+    margin: 0 0 8px;
+    color: #2563eb;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .new-lti-hero .page-title {
+    margin: 0;
+    color: #0f172a;
+    font-size: clamp(1.7rem, 3vw, 2.25rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+  }
+
+  .new-lti-hero .page-subtitle {
+    max-width: 590px;
+    margin: 10px 0 0;
+    color: #64748b;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .new-lti-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .new-lti-form-card {
+    padding: 28px;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.045);
+  }
+
+  .new-lti-form-header {
+    padding-bottom: 18px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid #eef2f7;
+  }
+
+  .new-lti-form-header h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1.05rem;
+    font-weight: 800;
+  }
+
+  .new-lti-form-header p {
+    margin: 6px 0 0;
+    color: #64748b;
+    font-size: 0.87rem;
+    line-height: 1.5;
+  }
+
+  .new-lti-form-card .field-group {
+    margin-bottom: 20px;
+  }
+
+  .new-lti-form-card label {
+    display: block;
+    margin-bottom: 8px;
+    color: #334155;
+    font-size: 0.85rem;
+    font-weight: 750;
+  }
+
+  .new-lti-form-card input,
+  .new-lti-form-card select,
+  .new-lti-form-card textarea {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 1px solid #dbe3ee;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #0f172a;
+    font-family: inherit;
+    font-size: 0.92rem;
+    outline: none;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  }
+
+  .new-lti-form-card textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+
+  .new-lti-form-card input:focus,
+  .new-lti-form-card select:focus,
+  .new-lti-form-card textarea:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  }
+
+  .new-lti-form-card .helptext {
+    margin: 7px 0 0;
+    color: #64748b;
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+
+  .new-lti-form-card .errorlist {
+    padding: 0;
+    margin: 8px 0 0;
+    list-style: none;
+  }
+
+  .new-lti-form-card .errorlist li {
+    padding: 8px 10px;
+    border: 1px solid #fecaca;
+    border-radius: 7px;
+    background: #fef2f2;
+    color: #b91c1c;
+    font-size: 0.8rem;
+  }
+
+  .new-lti-form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 22px;
+    margin-top: 24px;
+    border-top: 1px solid #eef2f7;
+  }
+
+  .new-lti-form-actions .btn {
+    min-height: 42px;
+  }
+
+  .new-lti-form-actions .btn-accent {
+    box-shadow: 0 5px 14px rgba(37, 99, 235, 0.2);
+  }
+
+  .new-lti-info-card {
+    padding: 20px;
+    border: 1px solid #dbeafe;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #f8fbff 0%, #eff6ff 100%);
+  }
+
+  .new-lti-info-icon {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    margin-bottom: 14px;
+    place-items: center;
+    border-radius: 12px;
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-size: 1.2rem;
+  }
+
+  .new-lti-info-card h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 0.95rem;
+    font-weight: 800;
+  }
+
+  .new-lti-info-card p {
+    margin: 9px 0 0;
+    color: #64748b;
+    font-size: 0.83rem;
+    line-height: 1.6;
+  }
+
+  .new-lti-info-card ul {
+    padding: 0;
+    margin: 16px 0 0;
+    list-style: none;
+  }
+
+  .new-lti-info-card li {
+    position: relative;
+    padding: 8px 0 8px 20px;
+    border-top: 1px solid rgba(148, 163, 184, 0.2);
+    color: #475569;
+    font-size: 0.8rem;
+    line-height: 1.45;
+  }
+
+  .new-lti-info-card li::before {
+    position: absolute;
+    top: 9px;
+    left: 2px;
+    color: #2563eb;
+    content: "✓";
+    font-weight: 800;
+  }
+
+  @media (max-width: 800px) {
+    .new-lti-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .new-lti-info-card {
+      order: -1;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .new-lti-page {
+      padding-top: 0;
+    }
+
+    .new-lti-hero,
+    .new-lti-form-card {
+      padding: 22px 20px;
+    }
+
+    .new-lti-form-actions {
+      align-items: stretch;
+      flex-direction: column-reverse;
+    }
+
+    .new-lti-form-actions .btn {
+      width: 100%;
+      text-align: center;
+    }
+  }
+</style>
+
+<div class="new-lti-page">
+
+  <section class="new-lti-hero">
+    <p class="page-eyebrow">Waybills Management</p>
+    <h1 class="page-title">Create New LTI</h1>
+    <p class="page-subtitle">
+      Create a Load Transport Instruction to organise and manage the waybills for a shipment.
+    </p>
+  </section>
+
+  <div class="new-lti-layout">
+
+    <section class="new-lti-form-card">
+      <div class="new-lti-form-header">
+        <h2>LTI Details</h2>
+        <p>Complete the required fields below to create a new instruction.</p>
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="field-group">
+          <label for="{{ field.id_for_label }}">
+            {{ field.label }}{% if field.field.required %} <span style="color:#dc2626;">*</span>{% endif %}
+          </label>
+
+          {{ field }}
+
+          {% if field.help_text %}
+            <p class="helptext">{{ field.help_text }}</p>
+          {% endif %}
+
+          {% if field.errors %}
+            <ul class="errorlist">
+              {% for e in field.errors %}
+                <li>{{ e }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+        {% endfor %}
+
+        <div class="new-lti-form-actions">
+          <a href="{% url 'waybills:company_lti_list' %}" class="btn btn-outline">
+            Cancel
+          </a>
+
+          <button type="submit" class="btn btn-accent">
+            Create LTI
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <aside class="new-lti-info-card">
+      <div class="new-lti-info-icon">📋</div>
+
+      <h3>Before you create</h3>
+      <p>
+        An LTI acts as the parent record for all waybills related to a particular transport instruction.
+      </p>
+
+      <ul>
+        <li>Confirm the STO reference is correct.</li>
+        <li>Review all required details before saving.</li>
+        <li>Add individual waybills or upload them in bulk after creation.</li>
+      </ul>
+    </aside>
+
+  </div>
+
+</div>
+
+{% endblock %}

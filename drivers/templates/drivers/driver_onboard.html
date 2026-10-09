@@ -1,0 +1,576 @@
+{% extends "base.html" %}
+{% block title %}Onboard Driver · Freightline{% endblock %}
+
+{% block content %}
+
+<style>
+  .onboard {
+    --ink: #0f172a;
+    --ink-2: #475569;
+    --ink-3: #94a3b8;
+    --line: #e8edf4;
+    --accent: #2a78d6;
+
+    max-width: 1220px;
+    margin: 0 auto;
+    padding: 4px 0 40px;
+    color: var(--ink);
+  }
+
+  /* ---------- hero ---------- */
+
+  .onboard-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 30px 34px 34px;
+    margin-bottom: 22px;
+    border-radius: 20px;
+    color: #fff;
+    background:
+      radial-gradient(900px 280px at 85% -35%, rgba(93, 162, 255, 0.4), transparent 62%),
+      linear-gradient(125deg, #061224 0%, #0e2748 48%, #17407a 100%);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.14) inset,
+      0 20px 40px -18px rgba(8, 25, 52, 0.6);
+  }
+
+  .onboard-hero::before {
+    content: "";
+    position: absolute;
+    inset: auto -30% -60% -30%;
+    height: 190px;
+    background-image:
+      linear-gradient(rgba(122, 176, 255, 0.2) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(122, 176, 255, 0.14) 1px, transparent 1px);
+    background-size: 46px 34px;
+    transform: perspective(300px) rotateX(58deg);
+    transform-origin: bottom center;
+    pointer-events: none;
+  }
+
+  .onboard-hero-inner {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .onboard-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin: 0 0 9px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(226, 238, 255, 0.82);
+  }
+
+  .onboard-eyebrow::before {
+    content: "";
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #58e8b0;
+    box-shadow: 0 0 0 4px rgba(88, 232, 176, 0.22);
+  }
+
+  .onboard-hero h1 {
+    margin: 0;
+    font-size: clamp(1.7rem, 3vw, 2.4rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+
+  .onboard-hero p {
+    max-width: 540px;
+    margin: 10px 0 0;
+    font-size: 0.94rem;
+    line-height: 1.6;
+    color: rgba(223, 235, 252, 0.88);
+  }
+
+  .pending-chip {
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    background: rgba(255, 255, 255, 0.1);
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  /* ---------- layout ---------- */
+
+  .onboard-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+  }
+
+  /* grid children default to min-width:auto and refuse to shrink below
+     their content, which pushes a phone into a horizontal scroll */
+  .onboard-layout > * { min-width: 0; }
+
+  .panel {
+    padding: 26px 28px 28px;
+    border-radius: 18px;
+    border: 1px solid var(--line);
+    background: #fff;
+    box-shadow:
+      0 1px 0 #fff inset,
+      0 18px 30px -24px rgba(15, 23, 42, 0.5);
+  }
+
+  .panel h2 {
+    margin: 0 0 4px;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+  }
+
+  .panel-sub {
+    margin: 0 0 22px;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: var(--ink-3);
+  }
+
+  /* ---------- steps ---------- */
+
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+  }
+
+  .steps li {
+    position: relative;
+    padding-left: 46px;
+    counter-increment: step;
+  }
+
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: grid;
+    place-items: center;
+    width: 30px; height: 30px;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #ffffff 0%, #eaf2ff 100%);
+    border: 1px solid #d5e4fb;
+    color: var(--accent);
+    font-size: 0.82rem;
+    font-weight: 800;
+    box-shadow: 0 5px 10px -5px rgba(42, 120, 214, 0.6);
+  }
+
+  .steps strong {
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 3px;
+  }
+
+  .steps span {
+    font-size: 0.83rem;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+
+  /* ---------- temporary password callout ---------- */
+
+  .temp-callout {
+    margin-top: 24px;
+    padding: 18px 20px;
+    border-radius: 14px;
+    border: 1px solid #ffe2ae;
+    background: linear-gradient(170deg, #fffaf0 0%, #fff4e0 100%);
+    box-shadow: 0 10px 18px -16px rgba(120, 80, 10, 0.7);
+  }
+
+  .temp-callout-label {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #9a6b12;
+  }
+
+  .temp-password {
+    display: inline-block;
+    margin: 9px 0 8px;
+    padding: 7px 16px;
+    border-radius: 10px;
+    border: 1px solid #f0cf94;
+    background: #fff;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: #7c5310;
+    box-shadow: 0 3px 8px -4px rgba(120, 80, 10, 0.5);
+  }
+
+  .temp-callout p {
+    margin: 0;
+    font-size: 0.82rem;
+    line-height: 1.55;
+    color: #875d12;
+  }
+
+  /* ---------- form ---------- */
+
+  .form-section-label {
+    margin: 0 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .form-section-label:first-of-type { margin-top: 6px; }
+  .form-section-label:not(:first-of-type) { margin-top: 28px; }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 16px;
+  }
+
+  .field-grid > * { min-width: 0; }
+  .field-grid .span-2 { grid-column: 1 / -1; }
+
+  .field label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--ink-2);
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d9e1ee;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: var(--ink);
+    box-sizing: border-box;
+  }
+
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(42, 120, 214, 0.16);
+  }
+
+  .field .helptext {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.75rem;
+    color: var(--ink-3);
+  }
+
+  .field .errorlist {
+    margin: 6px 0 0;
+    padding-left: 16px;
+    font-size: 0.78rem;
+    color: #b91c1c;
+  }
+
+  .form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+  }
+
+  .form-error-summary {
+    margin: 0 0 20px;
+    padding: 13px 16px;
+    border-radius: 12px;
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+    color: #b91c1c;
+    font-size: 0.85rem;
+  }
+
+  /* ---------- recent list ---------- */
+
+  .recent {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 6px;
+  }
+
+  .recent-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .recent-row:last-child { border-bottom: none; }
+
+  .recent-avatar {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    background: linear-gradient(170deg, #eaf2ff, #d6e6fd);
+    color: var(--accent);
+    font-size: 0.82rem;
+    font-weight: 800;
+  }
+
+  .recent-name {
+    font-size: 0.86rem;
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .recent-meta {
+    font-size: 0.75rem;
+    color: var(--ink-3);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .recent-state { margin-left: auto; flex: none; }
+
+  .pill {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .pill-temp { background: #fff4e0; color: #9a6b12; border: 1px solid #f3d9a6; }
+  .pill-set { background: #e8f8f1; color: #0d7a52; border: 1px solid #b9e7d3; }
+
+  .empty-note {
+    padding: 22px 4px;
+    font-size: 0.84rem;
+    color: var(--ink-3);
+  }
+
+  @media (max-width: 900px) {
+    .onboard-layout { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 620px) {
+    .panel { padding: 20px 17px 22px; }
+    .onboard-hero { padding: 24px 20px 26px; }
+    .field-grid { grid-template-columns: 1fr; }
+    .form-actions .btn { flex: 1 1 auto; text-align: center; }
+  }
+</style>
+
+<div class="onboard">
+
+  <section class="onboard-hero">
+    <div class="onboard-hero-inner">
+      <div>
+        <p class="onboard-eyebrow">Administrator only</p>
+        <h1>Onboard a Driver</h1>
+        <p>
+          Register the driver and issue their login in one step. Every account starts
+          on the shared temporary password — the company they belong to replaces it.
+        </p>
+      </div>
+
+      <div>
+        <span class="pending-chip">
+          {{ pending_password_count }} awaiting password change
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <div class="onboard-layout">
+
+    <section class="panel">
+      <h2>Driver details</h2>
+      <p class="panel-sub">
+        Everything on this form is administrator-managed. The company can later edit
+        contact details and change the login password — nothing else.
+      </p>
+
+      {% if form.errors %}
+        <p class="form-error-summary">Please correct the highlighted fields below.</p>
+      {% endif %}
+
+      <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        <p class="form-section-label">Assignment</p>
+        <div class="field-grid">
+          <div class="field span-2">
+            <label for="{{ form.company.id_for_label }}">{{ form.company.label }}</label>
+            {{ form.company }}
+            {% if form.company.errors %}<ul class="errorlist">{% for e in form.company.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+          </div>
+        </div>
+
+        <p class="form-section-label">Personal</p>
+        <div class="field-grid">
+          <div class="field">
+            <label for="{{ form.full_name.id_for_label }}">{{ form.full_name.label }}</label>
+            {{ form.full_name }}
+            {% if form.full_name.errors %}<ul class="errorlist">{% for e in form.full_name.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+          </div>
+
+          <div class="field">
+            <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+            {{ form.phone }}
+            {% if form.phone.errors %}<ul class="errorlist">{% for e in form.phone.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+          </div>
+
+          <div class="field">
+            <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+            {{ form.email }}
+            {% if form.email.errors %}<ul class="errorlist">{% for e in form.email.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+          </div>
+
+          <div class="field">
+            <label for="{{ form.status.id_for_label }}">{{ form.status.label }}</label>
+            {{ form.status }}
+            {% if form.status.errors %}<ul class="errorlist">{% for e in form.status.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+          </div>
+
+          <div class="field span-2">
+            <label for="{{ form.address.id_for_label }}">{{ form.address.label }}</label>
+            {{ form.address }}
+            {% if form.address.errors %}<ul class="errorlist">{% for e in form.address.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+          </div>
+        </div>
+
+        <p class="form-section-label">Licence &amp; photo</p>
+        <div class="field-grid">
+          <div class="field">
+            <label for="{{ form.license_number.id_for_label }}">{{ form.license_number.label }}</label>
+            {{ form.license_number }}
+            {% if form.license_number.errors %}<ul class="errorlist">{% for e in form.license_number.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+          </div>
+
+          <div class="field">
+            <label for="{{ form.license_expiry.id_for_label }}">{{ form.license_expiry.label }}</label>
+            {{ form.license_expiry }}
+            {% if form.license_expiry.errors %}<ul class="errorlist">{% for e in form.license_expiry.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+          </div>
+
+          <div class="field span-2">
+            <label for="{{ form.photo.id_for_label }}">{{ form.photo.label }}</label>
+            {{ form.photo }}
+            {% if form.photo.errors %}<ul class="errorlist">{% for e in form.photo.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+          </div>
+        </div>
+
+        <p class="form-section-label">Login</p>
+        <div class="field-grid">
+          <div class="field span-2">
+            <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+            {{ form.username }}
+            <span class="helptext">{{ form.username.help_text }}</span>
+            {% if form.username.errors %}<ul class="errorlist">{% for e in form.username.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+          </div>
+        </div>
+
+        <div class="temp-callout">
+          <span class="temp-callout-label">Temporary password issued</span>
+          <div class="temp-password">{{ temporary_password }}</div>
+          <p>
+            The driver signs in with this once. Their company replaces it from their own
+            Drivers page — that is the only driver-account action a company has.
+          </p>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Register driver &amp; create login</button>
+          <a href="{% url 'drivers:list' %}" class="btn btn-outline">Cancel</a>
+        </div>
+      </form>
+    </section>
+
+    <aside>
+      <section class="panel">
+        <h2>How it works</h2>
+        <p class="panel-sub">Three steps, one password handover.</p>
+
+        <ol class="steps">
+          <li>
+            <strong>Admin registers the driver</strong>
+            <span>Details and licence are captured here, and a login is created straight away.</span>
+          </li>
+          <li>
+            <strong>Company changes the password</strong>
+            <span>They open the driver on their Drivers page and set a real password. They cannot create, rename or remove the login.</span>
+          </li>
+          <li>
+            <strong>Driver signs in</strong>
+            <span>The driver uses their own profile page, and can change their password again at any time.</span>
+          </li>
+        </ol>
+      </section>
+
+      <section class="panel" style="margin-top:20px;">
+        <h2>Recently onboarded</h2>
+        <p class="panel-sub">Latest drivers with a login.</p>
+
+        {% if recent_onboarded %}
+          <div class="recent">
+            {% for d in recent_onboarded %}
+              <div class="recent-row">
+                <span class="recent-avatar">{{ d.full_name|slice:":1"|upper }}</span>
+                <div style="min-width:0;">
+                  <div class="recent-name">{{ d.full_name }}</div>
+                  <div class="recent-meta">{{ d.company.name }} · {{ d.user.username }}</div>
+                </div>
+                <span class="recent-state">
+                  {% if d.password_is_temporary %}
+                    <span class="pill pill-temp">Temporary</span>
+                  {% else %}
+                    <span class="pill pill-set">Password set</span>
+                  {% endif %}
+                </span>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="empty-note">No driver logins yet — the first one you create appears here.</p>
+        {% endif %}
+      </section>
+    </aside>
+  </div>
+</div>
+
+{% endblock %}

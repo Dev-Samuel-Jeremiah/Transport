@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}{{ truck.registration_number }} · Freightline{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div style="display:flex; align-items:center; gap:16px;">
+    {% if truck.photo %}
+      <img src="{{ truck.photo.url }}" alt="{{ truck.registration_number }}"
+           style="width:72px; height:72px; object-fit:cover; border-radius:10px; border:1px solid var(--slate-200); flex-shrink:0;">
+    {% else %}
+      <div style="width:72px; height:72px; border-radius:10px; border:1px dashed var(--slate-200); display:flex; align-items:center; justify-content:center; color:var(--slate-500); font-size:0.75rem; text-align:center; flex-shrink:0;">No photo</div>
+    {% endif %}
+    <div>
+      <p class="page-eyebrow">Fleet</p>
+      <h1 class="page-title mono">{{ truck.registration_number }}</h1>
+      <p class="page-subtitle">{{ truck.make }} {{ truck.model }} {% if truck.year %}· {{ truck.year }}{% endif %}</p>
+    </div>
+  </div>
+  <a href="{% url 'trucks:company_edit' truck.pk %}" class="btn btn-outline">Edit</a>
+</div>
+
+<div class="grid-2">
+  <div class="stack">
+    <div class="card">
+      <h2 class="section-title">Update Location & Status</h2>
+      <form method="post" action="{% url 'trucks:company_location_update' truck.pk %}">
+        {% csrf_token %}
+        {% for field in location_form %}
+          <div class="field-group">
+            <label>{{ field.label }}</label>
+            {{ field }}
+          </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary btn-sm">Update</button>
+      </form>
+      <p class="helptext mt-24">Last updated: {{ truck.last_location_updated_at|date:"d M Y, H:i"|default:"never" }}</p>
+      {% if truck.has_live_gps %}
+        <p class="helptext">GPS device <span class="mono">{{ truck.gps_device_id }}</span> is linked — once live, location will update automatically here.</p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2 class="section-title">Current Load</h2>
+      <table style="margin-bottom:16px;">
+        <tbody>
+          <tr><td class="text-muted">Waybill No.</td><td class="mono">{{ truck.waybill_number|default:"—" }}</td></tr>
+          <tr><td class="text-muted">LTI No.</td><td class="mono">{{ truck.lti_number|default:"—" }}</td></tr>
+          <tr><td class="text-muted">Origin</td><td>{{ truck.origin|default:"—" }}</td></tr>
+          <tr><td class="text-muted">Destination</td><td>{{ truck.destination|default:"—" }}</td></tr>
+          <tr><td class="text-muted">Commodities</td><td>{{ truck.commodities|default:"—" }}</td></tr>
+        </tbody>
+      </table>
+      <details>
+        <summary style="cursor:pointer;font-weight:600;font-size:13.5px;margin-bottom:12px;">Update current load details</summary>
+        <form method="post" action="{% url 'trucks:company_consignment_update' truck.pk %}">
+          {% csrf_token %}
+          {% for field in consignment_form %}
+            <div class="field-group">
+              <label>{{ field.label }}</label>
+              {{ field }}
+            </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-primary btn-sm">Save</button>
+        </form>
+      </details>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title">Transit History</h2>
+      {% if transits %}
+        <table>
+          <tbody>
+          {% for t in transits %}
+            <tr>
+              <td><a class="mono" href="{% url 'transit:company_detail' t.pk %}">{{ t.reference_code }}</a></td>
+              <td>{{ t.origin }} → {{ t.destination }}</td>
+              <td><span class="badge badge-info">{{ t.get_status_display }}</span></td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="text-muted">No transits recorded for this truck yet.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="section-title">Documents</h2>
+    {% if documents %}
+      <table style="margin-bottom:16px;">
+        <tbody>
+        {% for doc in documents %}
+          <tr>
+            <td>{{ doc.get_doc_type_display }}</td>
+            <td>
+              {% if doc.is_expired %}<span class="badge badge-danger">Expired</span>
+              {% elif doc.is_expiring_soon %}<span class="badge badge-warn">Expiring Soon</span>
+              {% else %}<span class="badge badge-ok">Valid</span>{% endif %}
+            </td>
+            <td><a href="{{ doc.file.url }}" target="_blank" class="btn btn-outline btn-sm">View</a></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="text-muted">No documents uploaded yet.</p>
+    {% endif %}
+
+    <details>
+      <summary style="cursor:pointer;font-weight:600;font-size:13.5px;margin-bottom:12px;">Upload a document</summary>
+      <form method="post" enctype="multipart/form-data" action="{% url 'trucks:company_document_upload' truck.pk %}">
+        {% csrf_token %}
+        {% for field in document_form %}
+          <div class="field-group"><label>{{ field.label }}</label>{{ field }}</div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary btn-sm">Upload</button>
+      </form>
+    </details>
+  </div>
+</div>
+{% endblock %}

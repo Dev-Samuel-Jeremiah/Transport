@@ -1,0 +1,378 @@
+{% extends "base.html" %}
+{% block title %}{% if object %}Edit Waybill{% else %}Add Waybill{% endif %} · Freightline{% endblock %}
+
+{% block content %}
+
+<style>
+  .waybill-form-page {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 8px 0 36px;
+  }
+
+  .waybill-form-hero {
+    padding: 28px 30px;
+    margin-bottom: 24px;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background:
+      radial-gradient(circle at top right, rgba(37, 99, 235, 0.09), transparent 36%),
+      linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+  }
+
+  .waybill-form-hero .page-eyebrow {
+    margin: 0 0 8px;
+    color: #2563eb;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .waybill-form-hero .page-title {
+    margin: 0;
+    color: #0f172a;
+    font-size: clamp(1.7rem, 3vw, 2.25rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+  }
+
+  .waybill-form-hero .page-subtitle {
+    max-width: 620px;
+    margin: 10px 0 0;
+    color: #64748b;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .waybill-form-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .waybill-form-card {
+    padding: 28px;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.045);
+  }
+
+  .waybill-form-header {
+    padding-bottom: 18px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid #eef2f7;
+  }
+
+  .waybill-form-header h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1.05rem;
+    font-weight: 800;
+  }
+
+  .waybill-form-header p {
+    margin: 6px 0 0;
+    color: #64748b;
+    font-size: 0.87rem;
+    line-height: 1.5;
+  }
+
+  .waybill-form-card .field-group {
+    margin-bottom: 20px;
+  }
+
+  .waybill-form-card label {
+    display: block;
+    margin-bottom: 8px;
+    color: #334155;
+    font-size: 0.85rem;
+    font-weight: 750;
+  }
+
+  .waybill-form-card input,
+  .waybill-form-card select,
+  .waybill-form-card textarea {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 1px solid #dbe3ee;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #0f172a;
+    font-family: inherit;
+    font-size: 0.92rem;
+    outline: none;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  }
+
+  .waybill-form-card input[type="checkbox"] {
+    width: auto;
+    min-height: auto;
+    padding: 0;
+    accent-color: #2563eb;
+  }
+
+  .waybill-form-card input[type="file"] {
+    padding: 8px 10px;
+  }
+
+  .waybill-form-card input[type="file"]::file-selector-button {
+    margin-right: 10px;
+    padding: 6px 10px;
+    border: 0;
+    border-radius: 6px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .waybill-form-card textarea {
+    min-height: 105px;
+    resize: vertical;
+  }
+
+  .waybill-form-card input:focus,
+  .waybill-form-card select:focus,
+  .waybill-form-card textarea:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  }
+
+  .waybill-form-card .helptext {
+    margin: 7px 0 0;
+    color: #64748b;
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+
+  .waybill-form-card .errorlist {
+    padding: 0;
+    margin: 8px 0 0;
+    list-style: none;
+  }
+
+  .waybill-form-card .errorlist li {
+    padding: 8px 10px;
+    border: 1px solid #fecaca;
+    border-radius: 7px;
+    background: #fef2f2;
+    color: #b91c1c;
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+
+  .waybill-form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 22px;
+    margin-top: 24px;
+    border-top: 1px solid #eef2f7;
+  }
+
+  .waybill-form-actions .btn {
+    min-height: 42px;
+  }
+
+  .waybill-form-actions .btn-accent {
+    box-shadow: 0 5px 14px rgba(37, 99, 235, 0.2);
+  }
+
+  .waybill-form-info {
+    padding: 20px;
+    border: 1px solid #dbeafe;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #f8fbff 0%, #eff6ff 100%);
+  }
+
+  .waybill-form-info-icon {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    margin-bottom: 14px;
+    place-items: center;
+    border-radius: 12px;
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-size: 1.2rem;
+  }
+
+  .waybill-form-info h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 0.95rem;
+    font-weight: 800;
+  }
+
+  .waybill-form-info p {
+    margin: 9px 0 0;
+    color: #64748b;
+    font-size: 0.83rem;
+    line-height: 1.6;
+  }
+
+  .waybill-form-info ul {
+    padding: 0;
+    margin: 16px 0 0;
+    list-style: none;
+  }
+
+  .waybill-form-info li {
+    position: relative;
+    padding: 8px 0 8px 20px;
+    border-top: 1px solid rgba(148, 163, 184, 0.2);
+    color: #475569;
+    font-size: 0.8rem;
+    line-height: 1.45;
+  }
+
+  .waybill-form-info li::before {
+    position: absolute;
+    top: 9px;
+    left: 2px;
+    color: #2563eb;
+    content: "✓";
+    font-weight: 800;
+  }
+
+  @media (max-width: 800px) {
+    .waybill-form-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .waybill-form-info {
+      order: -1;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .waybill-form-page {
+      padding-top: 0;
+    }
+
+    .waybill-form-hero,
+    .waybill-form-card {
+      padding: 22px 20px;
+    }
+
+    .waybill-form-actions {
+      align-items: stretch;
+      flex-direction: column-reverse;
+    }
+
+    .waybill-form-actions .btn {
+      width: 100%;
+      text-align: center;
+    }
+  }
+</style>
+
+<div class="waybill-form-page">
+
+  <section class="waybill-form-hero">
+    <p class="page-eyebrow">Waybills Management</p>
+
+    <h1 class="page-title">
+      {% if object %}
+        Edit <span class="mono">{{ object.waybill_number }}</span>
+      {% else %}
+        Add a Waybill
+      {% endif %}
+    </h1>
+
+    <p class="page-subtitle">
+      {% if object %}
+        Update the shipment record and save your changes when complete.
+      {% else %}
+        Add a new shipment record to the selected Load Transport Instruction.
+      {% endif %}
+    </p>
+  </section>
+
+  <div class="waybill-form-layout">
+
+    <section class="waybill-form-card">
+      <div class="waybill-form-header">
+        <h2>
+          {% if object %}Waybill Details{% else %}New Waybill Details{% endif %}
+        </h2>
+
+        <p>
+          Fields marked with <span style="color:#dc2626;">*</span> are required.
+        </p>
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="field-group">
+          {% if field.name != 'lti' or not field.is_hidden %}
+            <label for="{{ field.id_for_label }}">
+              {{ field.label }}
+              {% if field.field.required %}
+                <span style="color:#dc2626;">*</span>
+              {% endif %}
+            </label>
+          {% endif %}
+
+          {{ field }}
+
+          {% if field.help_text %}
+            <p class="helptext">{{ field.help_text }}</p>
+          {% endif %}
+
+          {% if field.errors %}
+            <ul class="errorlist">
+              {% for e in field.errors %}
+                <li>{{ e }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+        {% endfor %}
+
+        <div class="waybill-form-actions">
+          <a
+            href="{% if object %}{% url 'waybills:company_lti_detail' object.lti_id %}{% else %}{% url 'waybills:company_waybill_list' %}{% endif %}"
+            class="btn btn-outline"
+          >
+            Cancel
+          </a>
+
+          <button type="submit" class="btn btn-accent">
+            {% if object %}Save Changes{% else %}Add Waybill{% endif %}
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <aside class="waybill-form-info">
+      <div class="waybill-form-info-icon">🚚</div>
+
+      <h3>Waybill checklist</h3>
+
+      <p>
+        Accurate transport information makes it easier to track deliveries and report on operations.
+      </p>
+
+      <ul>
+        <li>Confirm the waybill number is unique.</li>
+        <li>Check origin and destination details.</li>
+        <li>Review vehicle, driver, commodity, and weight information.</li>
+        <li>Set the correct current transit status.</li>
+      </ul>
+    </aside>
+
+  </div>
+
+</div>
+
+{% endblock %}

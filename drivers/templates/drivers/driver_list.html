@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}Drivers · Freightline{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <p class="page-eyebrow">Network</p>
+    <h1 class="page-title">Drivers</h1>
+    <p class="page-subtitle">All drivers registered across every company.</p>
+  </div>
+  <div class="driver-header-actions">
+    <a href="{% url 'drivers:create' %}" class="btn btn-outline">+ Register Driver</a>
+    <a href="{% url 'drivers:onboard' %}" class="btn btn-accent">+ Onboard Driver &amp; Login</a>
+  </div>
+
+  <style>
+    .driver-header-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    .driver-header-actions .btn { white-space: nowrap; }
+  </style>
+</div>
+
+<style>
+  .checkbox-cell { width: 40px; padding-right: 4px !important; }
+  .checkbox-cell input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+  .bulk-actions-bar {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 14px;
+    padding: 12px 16px; margin-bottom: 14px;
+    border: 1px solid var(--slate-200); border-radius: 12px; background: #f8fafc;
+  }
+  .bulk-actions-bar .select-all-label {
+    display: flex; align-items: center; gap: 8px;
+    color: var(--slate-700); font-size: 0.85rem; font-weight: 700;
+  }
+  .bulk-actions-bar .select-all-label input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+  .bulk-actions-bar .selected-count { color: var(--slate-500); font-size: 0.83rem; margin-left: auto; }
+  .btn-danger { border: 1px solid #fecaca; background: #fef2f2; color: #b91c1c; }
+  .btn-danger:hover:not(:disabled) { background: #fee2e2; }
+  .btn-danger:disabled { opacity: 0.5; cursor: not-allowed; }
+
+</style>
+
+<form method="get" class="field-group" style="max-width:320px;">
+  <input type="text" name="q" placeholder="Search drivers…" value="{{ request.GET.q }}">
+</form>
+
+<form method="post" action="{% url 'drivers:bulk_delete' %}" id="driver-bulk-delete-form">
+  {% csrf_token %}
+
+  {% if drivers %}
+  <div class="bulk-actions-bar">
+    <label class="select-all-label">
+      <input type="checkbox" id="select-all-page">
+      Select all
+    </label>
+    <span class="selected-count" id="selected-count">0 selected</span>
+    <button type="submit" class="btn btn-danger btn-sm" id="delete-selected-btn" disabled
+            onclick="return confirm('Delete the selected driver(s)? This cannot be undone.');">
+      Delete Selected
+    </button>
+  </div>
+  {% endif %}
+
+  <div class="table-wrap driver-table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="checkbox-cell"></th>
+          <th>Name</th><th>Company</th><th>License No.</th><th>Phone</th><th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in drivers %}
+        <tr>
+          <td class="checkbox-cell">
+            <input type="checkbox" name="driver_ids" value="{{ d.pk }}" class="row-checkbox">
+          </td>
+          <td><a href="{% url 'drivers:detail' d.pk %}"><strong>{{ d.full_name }}</strong></a></td>
+          <td><a href="{% url 'companies:detail' d.company.pk %}">{{ d.company.name }}</a></td>
+          <td class="mono">{{ d.license_number }}</td>
+          <td>{{ d.phone }}</td>
+          <td><span class="badge {% if d.status == 'ACTIVE' %}badge-ok{% elif d.status == 'ON_TRIP' %}badge-info{% else %}badge-neutral{% endif %}">{{ d.get_status_display }}</span></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6"><div class="empty-state"><p>No drivers registered yet.</p>
+          <a href="{% url 'drivers:onboard' %}" class="btn btn-primary btn-sm">Onboard a driver</a></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</form>
+
+{% if is_paginated %}
+<div class="mt-24">
+  {% if page_obj.has_previous %}<a class="btn btn-outline btn-sm" href="?page={{ page_obj.previous_page_number }}">← Prev</a>{% endif %}
+  <span class="text-muted" style="margin:0 8px;">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a class="btn btn-outline btn-sm" href="?page={{ page_obj.next_page_number }}">Next →</a>{% endif %}
+</div>
+{% endif %}
+
+<script>
+  (function () {
+    var selectAllPage = document.getElementById('select-all-page');
+    var rowCheckboxes = document.querySelectorAll('.row-checkbox');
+    var deleteBtn = document.getElementById('delete-selected-btn');
+    var countLabel = document.getElementById('selected-count');
+
+    function updateState() {
+      var checked = document.querySelectorAll('.row-checkbox:checked').length;
+      if (countLabel) countLabel.textContent = checked + ' selected';
+      if (deleteBtn) deleteBtn.disabled = checked === 0;
+      if (selectAllPage) selectAllPage.checked = checked > 0 && checked === rowCheckboxes.length;
+    }
+
+    if (selectAllPage) {
+      selectAllPage.addEventListener('change', function () {
+        rowCheckboxes.forEach(function (cb) { cb.checked = selectAllPage.checked; });
+        updateState();
+      });
+    }
+    rowCheckboxes.forEach(function (cb) { cb.addEventListener('change', updateState); });
+    updateState();
+  })();
+</script>
+{% endblock %}

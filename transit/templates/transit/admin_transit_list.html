@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}Transits · Freightline{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <p class="page-eyebrow">Network</p>
+    <h1 class="page-title">Transits</h1>
+    <p class="page-subtitle">Every trip across every company.</p>
+  </div>
+  <div class="page-header-actions">
+    <a href="{% url 'transit:admin_export' %}?format=xlsx&{{ request.GET.urlencode }}" class="btn btn-outline">
+      Download Excel
+    </a>
+    <a href="{% url 'transit:admin_export' %}?format=csv&{{ request.GET.urlencode }}" class="btn btn-outline">
+      Download CSV
+    </a>
+    <a href="{% url 'transit:admin_audit_list' %}" class="btn btn-outline">View Audit Log</a>
+  </div>
+</div>
+
+<form method="get" class="field-group" style="max-width:260px;">
+  <select name="status" onchange="this.form.submit()">
+    <option value="">All statuses</option>
+    {% for value, label in status_choices %}
+      <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+</form>
+
+<style>
+  .page-header-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+  .page-header-actions .btn { white-space: nowrap; }
+  .checkbox-cell { width: 40px; padding-right: 4px !important; }
+  .checkbox-cell input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+  .bulk-actions-bar {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 14px;
+    padding: 12px 16px; margin-bottom: 14px;
+    border: 1px solid var(--slate-200); border-radius: 12px; background: #f8fafc;
+  }
+  .bulk-actions-bar .select-all-label {
+    display: flex; align-items: center; gap: 8px;
+    color: var(--slate-700); font-size: 0.85rem; font-weight: 700;
+  }
+  .bulk-actions-bar .select-all-label input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+  .bulk-actions-bar .selected-count { color: var(--slate-500); font-size: 0.83rem; margin-left: auto; }
+  .btn-danger { border: 1px solid #fecaca; background: #fef2f2; color: #b91c1c; }
+  .btn-danger:hover:not(:disabled) { background: #fee2e2; }
+  .btn-danger:disabled { opacity: 0.5; cursor: not-allowed; }
+  .confirm-cell { text-align: left; }
+  .confirm-cell input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #15803d; }
+  .confirm-cell input[type="checkbox"]:disabled { cursor: not-allowed; opacity: 0.35; }
+  .bulk-actions-hint { color: var(--slate-500); font-size: 0.78rem; width: 100%; margin: -4px 0 0; }
+</style>
+
+<form method="post" id="transit-bulk-form">
+  {% csrf_token %}
+
+  {% if transits %}
+  <div class="bulk-actions-bar">
+    <label class="select-all-label">
+      <input type="checkbox" id="select-all-page">
+      Select all
+    </label>
+    <span class="selected-count" id="selected-count">0 selected</span>
+    <button type="submit" formaction="{% url 'transit:admin_bulk_delete' %}" class="btn btn-danger btn-sm" id="delete-selected-btn" disabled
+            onclick="return confirm('Delete the selected transit(s)? This cannot be undone.');">
+      Delete Selected
+    </button>
+    <p class="bulk-actions-hint">Tick <strong>Confirm</strong> on a Delivered transit to move it to the Audit log straight away.</p>
+  </div>
+  {% endif %}
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th class="checkbox-cell"></th><th>Reference</th><th>Company</th><th>Route</th><th>Truck</th><th>Status</th><th class="confirm-cell">Confirm</th></tr></thead>
+      <tbody>
+        {% for t in transits %}
+        <tr>
+          <td class="checkbox-cell">
+            <input type="checkbox" name="transit_ids" value="{{ t.pk }}" class="row-checkbox">
+          </td>
+          <td><a class="mono" href="{% url 'transit:admin_detail' t.pk %}">{{ t.reference_code }}</a></td>
+          <td><a href="{% url 'companies:detail' t.company.pk %}">{{ t.company.name }}</a></td>
+          <td>{{ t.origin }} → {{ t.destination }}</td>
+          <td class="mono">{{ t.truck.registration_number }}</td>
+          <td><span class="badge {% if t.status == 'DELIVERED' %}badge-ok{% elif t.status == 'CANCELLED' %}badge-danger{% elif t.status == 'IN_TRANSIT' %}badge-info{% else %}badge-neutral{% endif %}">{{ t.get_status_display }}</span></td>
+          <td class="confirm-cell">
+            <input type="checkbox" class="confirm-checkbox" autocomplete="off"
+                   data-url="{% url 'transit:admin_confirm' t.pk %}"
+                   aria-label="Confirm {{ t.reference_code }}"
+                   {% if t.status == 'DELIVERED' %}title="Confirm and move to Audit"{% else %}disabled title="Only Delivered transits can be confirmed"{% endif %}>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7"><div class="empty-state"><p>No transits recorded yet.</p></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</form>
+
+<form method="post" id="confirm-transit-form" hidden>
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ request.get_full_path }}">
+</form>
+
+{% if is_paginated %}
+<div class="mt-24">
+  {% if page_obj.has_previous %}<a class="btn btn-outline btn-sm" href="?page={{ page_obj.previous_page_number }}">← Prev</a>{% endif %}
+  <span class="text-muted" style="margin:0 8px;">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a class="btn btn-outline btn-sm" href="?page={{ page_obj.next_page_number }}">Next →</a>{% endif %}
+</div>
+{% endif %}
+
+<script>
+  (function () {
+    var selectAllPage = document.getElementById('select-all-page');
+    var rowCheckboxes = document.querySelectorAll('.row-checkbox');
+    var deleteBtn = document.getElementById('delete-selected-btn');
+    var countLabel = document.getElementById('selected-count');
+
+    function updateState() {
+      var checked = document.querySelectorAll('.row-checkbox:checked').length;
+      if (countLabel) countLabel.textContent = checked + ' selected';
+      if (deleteBtn) deleteBtn.disabled = checked === 0;
+      if (selectAllPage) selectAllPage.checked = checked > 0 && checked === rowCheckboxes.length;
+    }
+
+    if (selectAllPage) {
+      selectAllPage.addEventListener('change', function () {
+        rowCheckboxes.forEach(function (cb) { cb.checked = selectAllPage.checked; });
+        updateState();
+      });
+    }
+    rowCheckboxes.forEach(function (cb) { cb.addEventListener('change', updateState); });
+    updateState();
+
+    // Confirm column: ticking a box posts that transit straight to Audit.
+    var confirmForm = document.getElementById('confirm-transit-form');
+    var confirmBoxes = document.querySelectorAll('.confirm-checkbox');
+    confirmBoxes.forEach(function (cb) {
+      cb.addEventListener('change', function () {
+        if (!cb.checked) return;
+        // Lock every box so a quick second click can't fire a second request.
+        confirmBoxes.forEach(function (other) { other.disabled = true; });
+        confirmForm.action = cb.dataset.url;
+        confirmForm.submit();
+      });
+    });
+  })();
+</script>
+{% endblock %}

@@ -1,0 +1,490 @@
+{% extends "base.html" %}
+{% block title %}{{ transit.reference_code }} · Freightline{% endblock %}
+
+{% block content %}
+
+<style>
+  .transit-detail-page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 8px 0 36px;
+  }
+
+  .transit-detail-hero {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 28px 30px;
+    margin-bottom: 24px;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background:
+      radial-gradient(circle at top right, rgba(37, 99, 235, 0.09), transparent 36%),
+      linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+  }
+
+  .transit-detail-hero .page-eyebrow {
+    margin: 0 0 8px;
+    color: #2563eb;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .transit-detail-hero .page-title {
+    margin: 0;
+    color: #0f172a;
+    font-size: clamp(1.5rem, 3vw, 2.05rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  .transit-detail-hero .page-subtitle {
+    display: flex;
+    align-items: center;
+    margin: 10px 0 0;
+    color: #64748b;
+    font-size: 0.95rem;
+  }
+
+  .transit-detail-hero .page-subtitle .arrow {
+    margin: 0 8px;
+    color: #94a3b8;
+  }
+
+  .transit-detail-hero-side {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+  }
+
+  .transit-status-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 16px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .transit-detail-back {
+    color: #64748b;
+    font-size: 0.83rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .transit-detail-back:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+  }
+
+  .transit-detail-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .transit-detail-card {
+    padding: 26px 28px;
+    margin-bottom: 24px;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.045);
+  }
+
+  .transit-detail-card:last-child {
+    margin-bottom: 0;
+  }
+
+  .transit-detail-card-header {
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eef2f7;
+  }
+
+  .transit-detail-card-header h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1.02rem;
+    font-weight: 800;
+  }
+
+  .transit-detail-card-header p {
+    margin: 5px 0 0;
+    color: #64748b;
+    font-size: 0.85rem;
+  }
+
+  .transit-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 24px;
+  }
+
+  .transit-info-grid.full-width {
+    grid-template-columns: 1fr;
+  }
+
+  .transit-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .transit-info-item.span-2 {
+    grid-column: 1 / -1;
+  }
+
+  .transit-info-label {
+    color: #94a3b8;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .transit-info-value {
+    color: #0f172a;
+    font-size: 0.94rem;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  .transit-info-value a {
+    color: #1d4ed8;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .transit-info-value a:hover {
+    text-decoration: underline;
+  }
+
+  .transit-info-value.muted {
+    color: #94a3b8;
+    font-weight: 500;
+  }
+
+  .transit-info-divider {
+    grid-column: 1 / -1;
+    height: 1px;
+    margin: 4px 0;
+    background: #eef2f7;
+  }
+
+  .transit-update-form .field-group {
+    margin-bottom: 16px;
+  }
+
+  .transit-update-form label {
+    display: block;
+    margin-bottom: 7px;
+    color: #334155;
+    font-size: 0.83rem;
+    font-weight: 750;
+  }
+
+  .transit-update-form input,
+  .transit-update-form select,
+  .transit-update-form textarea {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 12px;
+    border: 1px solid #dbe3ee;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #0f172a;
+    font-family: inherit;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  }
+
+  .transit-update-form input:focus,
+  .transit-update-form select:focus,
+  .transit-update-form textarea:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  }
+
+  .transit-update-form .coord-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .timeline {
+    position: relative;
+  }
+
+  .timeline-item {
+    position: relative;
+    padding: 0 0 24px 26px;
+  }
+
+  .timeline-item::before {
+    position: absolute;
+    top: 3px;
+    left: 0;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #ffffff;
+    border-radius: 999px;
+    background: #94a3b8;
+    box-shadow: 0 0 0 3px #eef2f7;
+    content: "";
+  }
+
+  .timeline-item::after {
+    position: absolute;
+    top: 15px;
+    left: 5px;
+    bottom: -6px;
+    width: 2px;
+    background: #eef2f7;
+    content: "";
+  }
+
+  .timeline-item:last-child::after {
+    display: none;
+  }
+
+  .timeline-item.status-delivered::before {
+    background: #16a34a;
+    box-shadow: 0 0 0 3px #dcfce7;
+  }
+
+  .timeline-item.status-in_transit::before {
+    background: #2563eb;
+    box-shadow: 0 0 0 3px #dbeafe;
+  }
+
+  .timeline-item.status-cancelled::before {
+    background: #dc2626;
+    box-shadow: 0 0 0 3px #fee2e2;
+  }
+
+  .timeline-time {
+    margin-bottom: 4px;
+    color: #94a3b8;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .timeline-title {
+    color: #0f172a;
+    font-size: 0.92rem;
+    font-weight: 750;
+  }
+
+  .timeline-body {
+    margin-top: 5px;
+    color: #64748b;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  .transit-detail-empty {
+    padding: 30px 10px;
+    color: #94a3b8;
+    font-size: 0.87rem;
+    text-align: center;
+  }
+
+  @media (max-width: 900px) {
+    .transit-detail-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .transit-detail-hero {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .transit-detail-hero-side {
+      align-items: flex-start;
+    }
+
+    .transit-detail-card {
+      padding: 22px 20px;
+    }
+
+    .transit-info-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .transit-update-form .coord-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="transit-detail-page">
+
+  <section class="transit-detail-hero">
+    <div>
+      <p class="page-eyebrow">Fleet Operations</p>
+      <h1 class="page-title mono">{{ transit.reference_code }}</h1>
+      <p class="page-subtitle">{{ transit.origin }}<span class="arrow">→</span>{{ transit.destination }}</p>
+    </div>
+
+    <div class="transit-detail-hero-side">
+      <span class="transit-status-pill badge {% if transit.status == 'DELIVERED' %}badge-ok{% elif transit.status == 'CANCELLED' %}badge-danger{% elif transit.status == 'IN_TRANSIT' %}badge-info{% else %}badge-neutral{% endif %}">
+        {{ transit.get_status_display }}
+      </span>
+      <a href="{% url 'transit:company_list' %}" class="transit-detail-back">← Back to Transits</a>
+    </div>
+  </section>
+
+  <div class="transit-detail-layout">
+
+    <div>
+      <section class="transit-detail-card">
+        <div class="transit-detail-card-header">
+          <h2>Trip Details</h2>
+          <p>Vehicle, cargo, and schedule information for this transit.</p>
+        </div>
+
+        <div class="transit-info-grid">
+          <div class="transit-info-item">
+            <span class="transit-info-label">Truck</span>
+            <span class="transit-info-value mono">
+              <a href="{% url 'trucks:company_detail' transit.truck.pk %}">{{ transit.truck.registration_number }}</a>
+            </span>
+          </div>
+
+          <div class="transit-info-item">
+            <span class="transit-info-label">Driver</span>
+            <span class="transit-info-value {% if not transit.driver %}muted{% endif %}">
+              {{ transit.driver.full_name|default:"Not assigned" }}
+            </span>
+          </div>
+
+          <div class="transit-info-item span-2">
+            <span class="transit-info-label">Cargo</span>
+            <span class="transit-info-value {% if not transit.cargo_description and not transit.display_weight_mt %}muted{% endif %}">
+              {{ transit.cargo_description|default:"—" }}{% if transit.display_weight_mt %} · {{ transit.display_weight_mt|floatformat:"-2" }} MT{% endif %}
+            </span>
+          </div>
+
+          <div class="transit-info-divider"></div>
+
+          <div class="transit-info-item">
+            <span class="transit-info-label">Scheduled departure</span>
+            <span class="transit-info-value mono {% if not transit.scheduled_departure %}muted{% endif %}">
+              {{ transit.scheduled_departure|date:"d M Y, H:i"|default:"—" }}
+            </span>
+          </div>
+
+          <div class="transit-info-item">
+            <span class="transit-info-label">Actual departure</span>
+            <span class="transit-info-value mono {% if not transit.actual_departure %}muted{% endif %}">
+              {{ transit.actual_departure|date:"d M Y, H:i"|default:"—" }}
+            </span>
+          </div>
+
+          <div class="transit-info-item">
+            <span class="transit-info-label">Expected arrival</span>
+            <span class="transit-info-value mono {% if not transit.expected_arrival %}muted{% endif %}">
+              {{ transit.expected_arrival|date:"d M Y, H:i"|default:"—" }}
+            </span>
+          </div>
+
+          <div class="transit-info-item">
+            <span class="transit-info-label">Actual arrival</span>
+            <span class="transit-info-value mono {% if not transit.actual_arrival %}muted{% endif %}">
+              {{ transit.actual_arrival|date:"d M Y, H:i"|default:"—" }}
+            </span>
+          </div>
+
+          {% if transit.notes %}
+          <div class="transit-info-divider"></div>
+          <div class="transit-info-item span-2">
+            <span class="transit-info-label">Notes</span>
+            <span class="transit-info-value">{{ transit.notes }}</span>
+          </div>
+          {% endif %}
+        </div>
+      </section>
+
+      <section class="transit-detail-card">
+        <div class="transit-detail-card-header">
+          <h2>Post a Tracking Update</h2>
+          <p>Record a new checkpoint — this moves the transit's overall status too.</p>
+        </div>
+
+        <form method="post" action="{% url 'transit:company_status_update' transit.pk %}" class="transit-update-form">
+          {% csrf_token %}
+
+          <div class="field-group">
+            <label for="{{ status_form.status.id_for_label }}">{{ status_form.status.label }}</label>
+            {{ status_form.status }}
+          </div>
+
+          <div class="field-group">
+            <label for="{{ status_form.location_text.id_for_label }}">{{ status_form.location_text.label }}</label>
+            {{ status_form.location_text }}
+          </div>
+
+          <div class="field-group">
+            <div class="coord-row">
+              <div>
+                <label for="{{ status_form.latitude.id_for_label }}">{{ status_form.latitude.label }}</label>
+                {{ status_form.latitude }}
+              </div>
+              <div>
+                <label for="{{ status_form.longitude.id_for_label }}">{{ status_form.longitude.label }}</label>
+                {{ status_form.longitude }}
+              </div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="{{ status_form.remarks.id_for_label }}">{{ status_form.remarks.label }}</label>
+            {{ status_form.remarks }}
+          </div>
+
+          <button type="submit" class="btn btn-accent btn-sm">Record Update</button>
+        </form>
+      </section>
+    </div>
+
+    <section class="transit-detail-card">
+      <div class="transit-detail-card-header">
+        <h2>Tracking Timeline</h2>
+        <p>Every checkpoint recorded for this trip, most recent first.</p>
+      </div>
+
+      <div class="timeline">
+        {% for u in tracking_updates %}
+        <div class="timeline-item status-{{ u.status|lower }}">
+          <div class="timeline-time">{{ u.recorded_at|date:"d M, H:i" }} · {{ u.get_source_display }}</div>
+          <div class="timeline-title">
+            {{ u.get_status_display }}{% if u.location_text %} — {{ u.location_text }}{% endif %}
+          </div>
+          {% if u.remarks %}<div class="timeline-body">{{ u.remarks }}</div>{% endif %}
+        </div>
+        {% empty %}
+        <p class="transit-detail-empty">No tracking updates yet.</p>
+        {% endfor %}
+      </div>
+    </section>
+
+  </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Drivers · {{ request.user.company.name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <p class="page-eyebrow">Fleet</p>
+    <h1 class="page-title">Drivers</h1>
+    <p class="page-subtitle">Drivers registered under your company. New drivers are onboarded by Freightline admin.</p>
+  </div>
+</div>
+
+<div class="table-wrap driver-table-wrap">
+  <table>
+    <thead><tr><th>Name</th><th>License No.</th><th>Phone</th><th>Status</th><th>Login</th></tr></thead>
+    <tbody>
+      {% for d in drivers %}
+      <tr>
+        <td><a href="{% url 'drivers:company_detail' d.pk %}"><strong>{{ d.full_name }}</strong></a></td>
+        <td class="mono">{{ d.license_number }}</td>
+        <td>{{ d.phone }}</td>
+        <td><span class="badge {% if d.status == 'ACTIVE' %}badge-ok{% elif d.status == 'ON_TRIP' %}badge-info{% else %}badge-neutral{% endif %}">{{ d.get_status_display }}</span></td>
+        <td>
+          {% if not d.user %}
+            <span class="badge badge-neutral">No login</span>
+          {% elif d.password_is_temporary %}
+            <a href="{% url 'drivers:company_detail' d.pk %}" class="badge badge-warn">Temporary password</a>
+          {% else %}
+            <span class="badge badge-ok">Password set</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5"><div class="empty-state"><p>No drivers registered under your company yet. Contact Freightline admin to onboard one.</p></div></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

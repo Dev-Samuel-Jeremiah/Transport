@@ -1,0 +1,552 @@
+{% extends "base.html" %}
+{% block title %}{{ lti.lti_number }} · Freightline{% endblock %}
+
+{% block content %}
+
+<style>
+  .company-lti-page {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 8px 0 32px;
+  }
+
+  .company-lti-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 28px 30px;
+    margin-bottom: 24px;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background:
+      radial-gradient(circle at top right, rgba(37, 99, 235, 0.09), transparent 34%),
+      linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+  }
+
+  .company-lti-hero .page-eyebrow {
+    margin: 0 0 8px;
+    color: #2563eb;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .company-lti-hero .page-title {
+    margin: 0;
+    color: #0f172a;
+    font-size: clamp(1.7rem, 3vw, 2.3rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+  }
+
+  .company-lti-hero .page-subtitle {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 12px 0 0;
+    color: #64748b;
+    font-size: 0.95rem;
+  }
+
+  .company-lti-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  .company-lti-actions .btn {
+    white-space: nowrap;
+  }
+
+  .company-lti-actions .btn-accent {
+    box-shadow: 0 5px 14px rgba(37, 99, 235, 0.2);
+  }
+
+  .company-lti-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .company-lti-summary-card {
+    padding: 18px 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.035);
+  }
+
+  .company-lti-summary-card span {
+    display: block;
+    margin-bottom: 8px;
+    color: #94a3b8;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .company-lti-summary-card strong {
+    color: #0f172a;
+    font-size: 1.05rem;
+    font-weight: 800;
+  }
+
+  .company-lti-summary-card .large-value {
+    font-size: 1.6rem;
+    line-height: 1;
+  }
+
+  .waybill-import-card {
+    padding: 20px;
+    margin-bottom: 24px;
+    border: 1px solid #dbeafe;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #f8fbff 0%, #eff6ff 100%);
+  }
+
+  .waybill-import-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .waybill-import-icon {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    place-items: center;
+    border-radius: 11px;
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-size: 1.1rem;
+  }
+
+  .waybill-import-header h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 0.98rem;
+    font-weight: 800;
+  }
+
+  .waybill-import-header p {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 0.84rem;
+    line-height: 1.5;
+  }
+
+  .waybill-import-form {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .waybill-import-form input[type="file"] {
+    max-width: 360px;
+    min-height: 42px;
+    padding: 8px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #475569;
+    font-size: 0.84rem;
+  }
+
+  .waybill-import-form input[type="file"]::file-selector-button {
+    margin-right: 10px;
+    padding: 6px 10px;
+    border: 0;
+    border-radius: 6px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .waybill-import-help {
+    margin: 13px 0 0;
+    color: #64748b;
+    font-size: 0.78rem;
+    line-height: 1.55;
+  }
+
+  .waybill-import-help strong {
+    color: #334155;
+  }
+
+  .company-waybill-table-card {
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.045);
+  }
+
+  .company-waybill-table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #fcfdff;
+  }
+
+  .company-waybill-table-header h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1rem;
+    font-weight: 800;
+  }
+
+  .company-waybill-table-header p {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 0.85rem;
+  }
+
+  .waybill-record-count {
+    padding: 6px 11px;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 0.78rem;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .company-waybill-table-card .table-wrap {
+    margin: 0;
+    overflow-x: auto;
+  }
+
+  .company-waybill-table-card table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .company-waybill-table-card thead {
+    background: #f8fafc;
+  }
+
+  .company-waybill-table-card th {
+    padding: 10px 12px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #64748b;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.065em;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .company-waybill-table-card td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eef2f7;
+    color: #334155;
+    font-size: 0.9rem;
+    vertical-align: middle;
+  }
+
+  .company-waybill-table-card tbody tr {
+    transition: background 0.18s ease;
+  }
+
+  .company-waybill-table-card tbody tr:hover {
+    background: #f8fbff;
+  }
+
+  .company-waybill-table-card tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .waybill-number {
+    color: #0f172a;
+    font-weight: 800;
+  }
+
+  .route-cell {
+    white-space: nowrap;
+  }
+
+  .vehicle-cell {
+    white-space: nowrap;
+  }
+
+  .weight-cell {
+    color: #0f172a;
+    font-weight: 750;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .table-action {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .empty-state {
+    padding: 58px 24px;
+    text-align: center;
+  }
+
+  .empty-state-icon {
+    display: grid;
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 14px;
+    place-items: center;
+    border-radius: 15px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 1.4rem;
+  }
+
+  .empty-state h3 {
+    margin: 0 0 7px;
+    color: #0f172a;
+    font-size: 1rem;
+  }
+
+  .empty-state p {
+    margin: 0 0 18px;
+    color: #64748b;
+  }
+
+  @media (max-width: 900px) {
+    .company-lti-hero {
+      flex-direction: column;
+    }
+
+    .company-lti-actions {
+      width: 100%;
+      justify-content: flex-start;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .company-lti-page {
+      padding-top: 0;
+    }
+
+    .company-lti-hero {
+      padding: 22px 20px;
+    }
+
+    .company-lti-actions .btn {
+      flex: 1 1 100%;
+      text-align: center;
+    }
+
+    .company-lti-summary {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .waybill-import-card {
+      padding: 18px;
+    }
+
+    .waybill-import-form {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .waybill-import-form input[type="file"],
+    .waybill-import-form .btn {
+      width: 100%;
+      max-width: none;
+    }
+
+    .company-waybill-table-header {
+      align-items: flex-start;
+      flex-direction: column;
+      padding: 18px 20px;
+    }
+  }
+</style>
+
+<div class="company-lti-page">
+
+  <section class="company-lti-hero">
+    <div>
+      <p class="page-eyebrow">Waybills · LTI Overview</p>
+      <h1 class="page-title mono">{{ lti.lti_number }}</h1>
+
+      <p class="page-subtitle">
+        <span>STO: <strong class="mono">{{ lti.sto|default:"—" }}</strong></span>
+        <span>•</span>
+        {% if lti.status == 'OPEN' %}
+          <span class="badge badge-ok">Open</span>
+        {% else %}
+          <span class="badge badge-neutral">Closed</span>
+        {% endif %}
+      </p>
+    </div>
+
+    <div class="company-lti-actions">
+      <a href="{% url 'waybills:company_waybill_export' %}?format=xlsx&lti={{ lti.pk }}" class="btn btn-outline">
+        Download Excel
+      </a>
+
+      <a href="{% url 'waybills:company_waybill_export' %}?format=csv&lti={{ lti.pk }}" class="btn btn-outline">
+        Download CSV
+      </a>
+    </div>
+  </section>
+
+  <section class="company-lti-summary">
+    <div class="company-lti-summary-card">
+      <span>Total Waybills</span>
+      <strong class="large-value">{{ waybills|length }}</strong>
+    </div>
+
+    <div class="company-lti-summary-card">
+      <span>LTI Reference</span>
+      <strong class="mono">{{ lti.lti_number }}</strong>
+    </div>
+
+    <div class="company-lti-summary-card">
+      <span>STO Reference</span>
+      <strong class="mono">{{ lti.sto|default:"—" }}</strong>
+    </div>
+  </section>
+
+  <section class="waybill-import-card">
+    <div class="waybill-import-header">
+      <div class="waybill-import-icon">⇧</div>
+
+      <div>
+        <h2>Bulk Upload Waybills</h2>
+        <p>Import multiple shipment records into this LTI from a CSV or Excel file.</p>
+      </div>
+    </div>
+
+    <form
+      method="post"
+      action="{% url 'waybills:company_waybill_import' lti.pk %}"
+      enctype="multipart/form-data"
+      class="waybill-import-form"
+    >
+      {% csrf_token %}
+
+      <input type="file" name="file" accept=".csv,.xlsx" required>
+
+      <button type="submit" class="btn btn-outline btn-sm">
+        Upload Waybills
+      </button>
+    </form>
+
+    <p class="waybill-import-help">
+      <strong>Required column order:</strong>
+      Waybill No, Date, Transporter Name, Vehicle Id, Driver Name, Origin,
+      Destination, Commodity, MT, Transit Status. Accepted formats: .csv and .xlsx.
+    </p>
+  </section>
+
+  <section class="company-waybill-table-card">
+    <div class="company-waybill-table-header">
+      <div>
+        <h2>Waybill Register</h2>
+        <p>View and manage every waybill assigned to this LTI.</p>
+      </div>
+
+      <span class="waybill-record-count">
+        {{ waybills|length }} waybill{{ waybills|length|pluralize }}
+      </span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Waybill No.</th>
+            <th>Date</th>
+            <th>Origin</th>
+            <th>Destination</th>
+            <th>Vehicle</th>
+            <th>Driver</th>
+            <th>Commodity</th>
+            <th style="text-align: right;">MT</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for w in waybills %}
+          <tr>
+            <td class="mono">
+              <strong class="waybill-number">{{ w.waybill_number }}</strong>
+            </td>
+
+            <td class="text-muted">
+              {{ w.date|default:"—" }}
+            </td>
+
+            <td class="text-muted route-cell">
+              {{ w.origin }}
+            </td>
+
+            <td class="text-muted route-cell">
+              {{ w.destination }}
+            </td>
+
+            <td class="text-muted mono vehicle-cell">
+              {{ w.truck.registration_number|default:w.vehicle_id|default:"—" }}
+            </td>
+
+            <td class="text-muted">
+              {{ w.driver.full_name|default:w.driver_name|default:"—" }}
+            </td>
+
+            <td class="text-muted cell-wrap">
+              {{ w.commodity|default:"—" }}
+            </td>
+
+            <td class="weight-cell">
+              {{ w.weight_mt|default:"—" }}
+            </td>
+
+            <td>
+              {% if w.status == 'OFFLOADED' %}
+                <span class="badge badge-ok">Offloaded</span>
+              {% elif w.status == 'IN_TRANSIT' %}
+                <span class="badge badge-info">In Transit</span>
+              {% elif w.status == 'CANCELLED' %}
+                <span class="badge badge-neutral">Cancelled</span>
+              {% else %}
+                <span class="badge badge-warn">Pending</span>
+              {% endif %}
+            </td>
+          </tr>
+
+          {% empty %}
+          <tr>
+            <td colspan="9">
+              <div class="empty-state">
+                <div class="empty-state-icon">🚚</div>
+                <h3>No waybills yet</h3>
+                <p>Upload a completed spreadsheet to bring this LTI's waybills in, or ask an administrator to add them for you.</p>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+{% endblock %}
