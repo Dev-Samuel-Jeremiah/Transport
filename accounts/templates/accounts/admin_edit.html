@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Edit {{ target.display_name }} · Freightline{% endblock %}
+{% block content %}
+<style>
+  .edit-layout {
+    max-width: 640px;
+  }
+
+  .edit-card form {
+    padding: 26px 28px 8px;
+  }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 16px;
+  }
+
+  .edit-card input[type="text"],
+  .edit-card input[type="email"] {
+    width: 100%;
+  }
+
+  .errorlist {
+    margin: 6px 0 0;
+    padding-left: 18px;
+    color: var(--danger);
+    font-size: 0.79rem;
+    list-style: disc;
+  }
+
+  .edit-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 20px 28px;
+    border-top: 1px solid var(--slate-100);
+    background: var(--slate-50);
+  }
+
+  @media (max-width: 640px) {
+    .field-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="page-header">
+  <div>
+    <p class="page-eyebrow"><a href="{% url 'accounts:control_room' %}#people">Control Room</a></p>
+    <h1 class="page-title">Edit {{ target.display_name }}</h1>
+    <p class="page-subtitle">Update this administrator's profile, including their username. Password isn't affected — use Reset password on the Control Room.</p>
+  </div>
+</div>
+
+<div class="edit-layout">
+  <div class="card edit-card">
+    <form method="post" id="edit-form">
+      {% csrf_token %}
+      {% if form.non_field_errors %}{{ form.non_field_errors }}{% endif %}
+
+      <div class="field-group">
+        <label for="{{ form.full_name.id_for_label }}">{{ form.full_name.label }} *</label>
+        {{ form.full_name }}
+        {% if form.full_name.errors %}{{ form.full_name.errors }}{% endif %}
+      </div>
+
+      <div class="field-group">
+        <label for="{{ form.username.id_for_label }}">{{ form.username.label }} *</label>
+        {{ form.username }}
+        <p class="helptext">{{ form.username.help_text }} Changing it means they must sign in with the new one from now on.</p>
+        {% if form.username.errors %}{{ form.username.errors }}{% endif %}
+      </div>
+
+      <div class="field-grid">
+        <div class="field-group">
+          <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+          {{ form.email }}
+          {% if form.email.errors %}{{ form.email.errors }}{% endif %}
+        </div>
+        <div class="field-group">
+          <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+          {{ form.phone }}
+          {% if form.phone.errors %}{{ form.phone.errors }}{% endif %}
+        </div>
+      </div>
+    </form>
+
+    <div class="edit-footer">
+      <a href="{{ cancel_url }}" class="btn btn-outline">Cancel</a>
+      <button type="submit" form="edit-form" class="btn btn-accent">Save Changes</button>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,740 @@
+{% extends "base.html" %}
+{% block title %}Control Room · Freightline{% endblock %}
+{% block content %}
+<style>
+  .cr-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .cr-jump {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+
+  .cr-jump a {
+    padding: 7px 13px;
+    border: 1px solid var(--slate-200);
+    border-radius: 999px;
+    background: #ffffff;
+    color: var(--slate-600);
+    font-size: 0.79rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .cr-jump a:hover {
+    border-color: #93c5fd;
+    background: var(--blue-100);
+    color: #1d4ed8;
+  }
+
+  .cr-section {
+    margin-bottom: 36px;
+  }
+
+  .cr-section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .cr-section-header h2 {
+    margin: 0;
+    color: var(--slate-950);
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .cr-section-header p {
+    margin: 4px 0 0;
+    color: var(--slate-500);
+    font-size: 0.85rem;
+  }
+
+  /* Stats */
+
+  .cr-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .cr-stat {
+    padding: 18px 20px;
+    border: 1px solid var(--slate-200);
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.035);
+  }
+
+  .cr-stat-label {
+    color: var(--slate-500);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .cr-stat-value {
+    margin-top: 8px;
+    color: var(--slate-950);
+    font-size: 1.7rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  .cr-stat-note {
+    margin-top: 4px;
+    color: var(--slate-400);
+    font-size: 0.77rem;
+  }
+
+  /* People & access */
+
+  .cr-notice {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    border: 1px solid #fde68a;
+    border-radius: 12px;
+    background: #fffbeb;
+    color: #92400e;
+    font-size: 0.84rem;
+  }
+
+  .cr-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+    border: 1px solid var(--slate-200);
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.035);
+  }
+
+  .cr-filters input[type="text"] {
+    flex: 1 1 280px;
+    min-width: 220px;
+  }
+
+  .cr-table-wrap table {
+    width: auto;
+    max-width: 100%;
+  }
+
+  .cr-table-wrap th,
+  .cr-table-wrap td {
+    padding: 11px 12px;
+    white-space: nowrap;
+    font-size: 0.86rem;
+    vertical-align: middle;
+  }
+
+  .cr-table-wrap td.company-cell {
+    max-width: 190px;
+    white-space: normal;
+  }
+
+  .member-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .member-avatar {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    flex: none;
+    place-items: center;
+    border-radius: 10px;
+    background: var(--blue-100);
+    color: var(--blue-500);
+    font-size: 0.8rem;
+    font-weight: 800;
+  }
+
+  .member-avatar.is-disabled {
+    background: var(--slate-100);
+    color: var(--slate-400);
+  }
+
+  .member-name {
+    color: var(--slate-950);
+    font-size: 0.87rem;
+    font-weight: 750;
+  }
+
+  .member-handle {
+    color: var(--slate-500);
+    font-size: 0.75rem;
+  }
+
+  .status-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  .row-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .row-actions form {
+    margin: 0;
+  }
+
+  .row-actions .btn {
+    min-height: 30px;
+    padding: 5px 9px;
+    font-size: 0.72rem;
+  }
+
+  .btn-danger-soft {
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+    color: #b91c1c;
+  }
+
+  .btn-danger-soft:hover {
+    background: #fee2e2;
+  }
+
+  .btn-ok-soft {
+    border: 1px solid #bbf7d0;
+    background: #f0fdf4;
+    color: #15803d;
+  }
+
+  .btn-ok-soft:hover {
+    background: #dcfce7;
+  }
+
+  .cr-empty {
+    padding: 44px 20px;
+    color: var(--slate-500);
+    text-align: center;
+  }
+
+  .cr-pager {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  /* Register tabs */
+
+  .register-card {
+    overflow: hidden;
+  }
+
+  .register-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 14px 18px 0;
+    border-bottom: 1px solid var(--slate-100);
+  }
+
+  .register-tab-btn {
+    padding: 10px 16px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: var(--slate-500);
+    font: inherit;
+    font-size: 0.86rem;
+    font-weight: 750;
+    cursor: pointer;
+  }
+
+  .register-tab-btn.is-active {
+    border-bottom-color: var(--blue-500);
+    color: #1d4ed8;
+  }
+
+  .register-panel {
+    display: none;
+    padding: 22px 24px 26px;
+  }
+
+  .register-panel.is-active {
+    display: block;
+  }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 16px;
+  }
+
+  .register-panel select,
+  .register-panel input[type="text"],
+  .register-panel input[type="email"],
+  .register-panel input[type="date"] {
+    width: 100%;
+  }
+
+  .errorlist {
+    margin: 6px 0 0;
+    padding-left: 18px;
+    color: var(--danger);
+    font-size: 0.79rem;
+    list-style: disc;
+  }
+
+  .temp-password-field {
+    max-width: 260px;
+  }
+
+  /* Shortcuts */
+
+  .cr-shortcuts {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .cr-shortcut {
+    display: flex;
+    flex-direction: column;
+    padding: 18px 20px;
+    text-decoration: none;
+  }
+
+  .cr-shortcut-label {
+    color: var(--slate-500);
+    font-size: 0.74rem;
+    font-weight: 750;
+  }
+
+  .cr-shortcut-value {
+    margin-top: 6px;
+    color: var(--slate-950);
+    font-size: 1.3rem;
+    font-weight: 800;
+  }
+
+  @media (max-width: 1100px) {
+    .cr-stats, .cr-shortcuts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .field-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="cr-hero">
+  <div>
+    <p class="page-eyebrow">Admin Console</p>
+    <h1 class="page-title">Control Room</h1>
+    <p class="page-subtitle">Everyone who has access, the whole network at a glance, and every role you can register — all from one place.</p>
+  </div>
+</div>
+
+<nav class="cr-jump">
+  <a href="#overview">Overview</a>
+  <a href="#people">People &amp; Access</a>
+  <a href="#register">Register</a>
+  <a href="#shortcuts">Shortcuts</a>
+</nav>
+
+<section class="cr-section" id="overview">
+  <div class="cr-section-header">
+    <div>
+      <h2>Network Overview</h2>
+      <p>A live snapshot of everything running on the platform.</p>
+    </div>
+  </div>
+  <div class="cr-stats">
+    <div class="cr-stat"><div class="cr-stat-label">Companies</div><div class="cr-stat-value">{{ stats.companies }}</div></div>
+    <div class="cr-stat"><div class="cr-stat-label">Administrators</div><div class="cr-stat-value">{{ stats.admins }}</div></div>
+    <div class="cr-stat"><div class="cr-stat-label">Company Users</div><div class="cr-stat-value">{{ stats.company_users }}</div></div>
+    <div class="cr-stat"><div class="cr-stat-label">Drivers</div><div class="cr-stat-value">{{ stats.drivers }}</div><div class="cr-stat-note">{{ stats.driver_logins }} with a login</div></div>
+    <div class="cr-stat"><div class="cr-stat-label">Trucks</div><div class="cr-stat-value">{{ stats.trucks }}</div><div class="cr-stat-note">{{ stats.trucks_on_trip }} on trip</div></div>
+    <div class="cr-stat"><div class="cr-stat-label">Active Transits</div><div class="cr-stat-value">{{ stats.active_transits }}</div></div>
+    <div class="cr-stat"><div class="cr-stat-label">Waybills</div><div class="cr-stat-value">{{ stats.waybills }}</div></div>
+  </div>
+</section>
+
+<section class="cr-section" id="people">
+  <div class="cr-section-header">
+    <div>
+      <h2>People &amp; Access</h2>
+      <p>Every login on the platform — Administrators, Company Users and Drivers — in one list.</p>
+    </div>
+  </div>
+
+  {% if pending_password_count %}
+    <div class="cr-notice">
+      <span>🔒</span>
+      <span><strong>{{ pending_password_count }}</strong> account{{ pending_password_count|pluralize }} still on the temporary password <code>{{ temporary_password }}</code> — they'll be forced to change it the first time they sign in.</span>
+    </div>
+  {% endif %}
+
+  <form method="get" class="cr-filters">
+    <input type="text" name="q" value="{{ search_query }}" placeholder="Search name, username, email or company…" aria-label="Search people">
+    <select name="role" aria-label="Filter by role" onchange="this.form.submit()">
+      <option value="">All roles</option>
+      <option value="ADMIN" {% if role_filter == 'ADMIN' %}selected{% endif %}>Administrator</option>
+      <option value="COMPANY" {% if role_filter == 'COMPANY' %}selected{% endif %}>Company User</option>
+      <option value="DRIVER" {% if role_filter == 'DRIVER' %}selected{% endif %}>Driver</option>
+    </select>
+    <select name="company" aria-label="Filter by company" onchange="this.form.submit()">
+      <option value="">All companies</option>
+      {% for c in companies %}
+        <option value="{{ c.pk }}" {% if selected_company == c.pk|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-outline btn-sm">Filter</button>
+    {% if search_query or role_filter or selected_company %}
+      <a href="{% url 'accounts:control_room' %}#people" class="btn btn-outline btn-sm">Reset</a>
+    {% endif %}
+  </form>
+
+  <div class="table-wrap cr-table-wrap">
+    {% if users %}
+    <table>
+      <thead>
+        <tr>
+          <th>User</th><th>Role</th><th>Company</th><th>Last sign-in</th><th>Status</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>
+            <div class="member-cell">
+              <span class="member-avatar {% if not u.is_active %}is-disabled{% endif %}">{{ u.display_name|slice:":1"|upper }}</span>
+              <div>
+                <div class="member-name">{{ u.display_name }}</div>
+                {% if u.get_full_name %}<div class="member-handle mono">{{ u.username }}</div>{% endif %}
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="badge {% if u.role == 'ADMIN' %}badge-info{% elif u.role == 'DRIVER' %}badge-neutral{% else %}badge-ok{% endif %}">{{ u.get_role_display }}</span>
+          </td>
+          <td class="company-cell">
+            {% if u.role == 'ADMIN' %}<span class="text-muted">—</span>
+            {% elif u.company %}<a href="{% url 'companies:detail' u.company.pk %}">{{ u.company.name }}</a>
+            {% elif u.driver_profile %}<a href="{% url 'companies:detail' u.driver_profile.company.pk %}">{{ u.driver_profile.company.name }}</a>
+            {% else %}<span class="text-muted">—</span>{% endif %}
+          </td>
+          <td class="text-muted">{{ u.last_login|date:"d M Y, H:i"|default:"Never" }}</td>
+          <td>
+            <div class="status-stack">
+              {% if u.is_active %}<span class="badge badge-ok">Active</span>{% else %}<span class="badge badge-neutral">Disabled</span>{% endif %}
+              {% if u.password_is_temporary %}<span class="badge badge-warn">Temporary password</span>{% endif %}
+            </div>
+          </td>
+          <td>
+            <div class="row-actions">
+              {% if u.role == 'COMPANY' %}
+                <a href="{% url 'accounts:user_edit' u.pk %}?next={{ request.get_full_path|urlencode }}" class="btn btn-outline btn-sm">Edit</a>
+              {% elif u.role == 'ADMIN' %}
+                <a href="{% url 'accounts:admin_edit' u.pk %}?next={{ request.get_full_path|urlencode }}" class="btn btn-outline btn-sm">Edit</a>
+              {% elif u.role == 'DRIVER' and u.driver_profile %}
+                <a href="{% url 'drivers:detail' u.driver_profile.pk %}" class="btn btn-outline btn-sm">Edit</a>
+              {% endif %}
+              <form method="post" action="{% url 'accounts:user_reset_password' u.pk %}"
+                    onsubmit="return confirm('Reset the password for {{ u.display_name|escapejs }} to the temporary password? They will have to set a new one the next time they sign in.');">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <button type="submit" class="btn btn-outline btn-sm">Reset password</button>
+              </form>
+              {% if u.pk != request.user.pk %}
+              <form method="post" action="{% url 'accounts:user_toggle_active' u.pk %}"
+                    onsubmit="return confirm('{% if u.is_active %}Disable{% else %}Enable{% endif %} {{ u.display_name|escapejs }}? {% if u.is_active %}They will no longer be able to sign in.{% else %}They will be able to sign in again.{% endif %}');">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                {% if u.is_active %}
+                  <button type="submit" class="btn btn-danger-soft btn-sm">Disable</button>
+                {% else %}
+                  <button type="submit" class="btn btn-ok-soft btn-sm">Enable</button>
+                {% endif %}
+              </form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="cr-empty">
+      <h3>{% if search_query or role_filter or selected_company %}No one matches those filters{% else %}No one's been registered yet{% endif %}</h3>
+      <p>{% if search_query or role_filter or selected_company %}Try a different search, role or company.{% else %}Use the Register section below to add your first user.{% endif %}</p>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if is_paginated %}
+  <div class="cr-pager">
+    {% if page_obj.has_previous %}<a class="btn btn-outline btn-sm" href="?{% if filter_query %}{{ filter_query }}&{% endif %}page={{ page_obj.previous_page_number }}#people">← Prev</a>{% endif %}
+    <span class="text-muted">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a class="btn btn-outline btn-sm" href="?{% if filter_query %}{{ filter_query }}&{% endif %}page={{ page_obj.next_page_number }}#people">Next →</a>{% endif %}
+  </div>
+  {% endif %}
+</section>
+
+<section class="cr-section" id="register">
+  <div class="cr-section-header">
+    <div>
+      <h2>Register Someone</h2>
+      <p>Pick a role — every new login starts on the temporary password <code>{{ temporary_password }}</code> and must be changed at first sign-in.</p>
+    </div>
+  </div>
+
+  <div class="card register-card">
+    <div class="register-tabs" role="tablist">
+      <button type="button" class="register-tab-btn" data-tab="admin">Administrator</button>
+      <button type="button" class="register-tab-btn" data-tab="company">Company User</button>
+      <button type="button" class="register-tab-btn" data-tab="driver">Driver</button>
+    </div>
+
+    <div class="register-panel" data-panel="admin">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="register_role" value="admin">
+        {% if admin_form.non_field_errors %}{{ admin_form.non_field_errors }}{% endif %}
+        <div class="field-grid">
+          <div class="field-group">
+            <label for="{{ admin_form.full_name.id_for_label }}">{{ admin_form.full_name.label }} *</label>
+            {{ admin_form.full_name }}
+            {% if admin_form.full_name.errors %}{{ admin_form.full_name.errors }}{% endif %}
+          </div>
+          <div class="field-group">
+            <label for="{{ admin_form.username.id_for_label }}">{{ admin_form.username.label }} *</label>
+            {{ admin_form.username }}
+            <p class="helptext">{{ admin_form.username.help_text }}</p>
+            {% if admin_form.username.errors %}{{ admin_form.username.errors }}{% endif %}
+          </div>
+        </div>
+        <div class="field-grid">
+          <div class="field-group">
+            <label for="{{ admin_form.email.id_for_label }}">{{ admin_form.email.label }}</label>
+            {{ admin_form.email }}
+            {% if admin_form.email.errors %}{{ admin_form.email.errors }}{% endif %}
+          </div>
+          <div class="field-group">
+            <label for="{{ admin_form.phone.id_for_label }}">{{ admin_form.phone.label }}</label>
+            {{ admin_form.phone }}
+            {% if admin_form.phone.errors %}{{ admin_form.phone.errors }}{% endif %}
+          </div>
+        </div>
+        <div class="field-group temp-password-field">
+          <label>Password</label>
+          <input type="text" value="{{ temporary_password }}" disabled aria-label="Temporary password">
+          <p class="helptext">Full network access — only register someone here if they should see and manage every company.</p>
+        </div>
+        <button type="submit" class="btn btn-accent">Register Administrator</button>
+      </form>
+    </div>
+
+    <div class="register-panel" data-panel="company">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="register_role" value="company">
+        {% if company_form.non_field_errors %}{{ company_form.non_field_errors }}{% endif %}
+        <div class="field-group">
+          <label for="{{ company_form.company.id_for_label }}">{{ company_form.company.label }} *</label>
+          {{ company_form.company }}
+          <p class="helptext">{{ company_form.company.help_text }}</p>
+          {% if company_form.company.errors %}{{ company_form.company.errors }}{% endif %}
+        </div>
+        <div class="field-grid">
+          <div class="field-group">
+            <label for="{{ company_form.full_name.id_for_label }}">{{ company_form.full_name.label }} *</label>
+            {{ company_form.full_name }}
+            {% if company_form.full_name.errors %}{{ company_form.full_name.errors }}{% endif %}
+          </div>
+          <div class="field-group">
+            <label for="{{ company_form.username.id_for_label }}">{{ company_form.username.label }} *</label>
+            {{ company_form.username }}
+            <p class="helptext">{{ company_form.username.help_text }}</p>
+            {% if company_form.username.errors %}{{ company_form.username.errors }}{% endif %}
+          </div>
+        </div>
+        <div class="field-grid">
+          <div class="field-group">
+            <label for="{{ company_form.email.id_for_label }}">{{ company_form.email.label }}</label>
+            {{ company_form.email }}
+            {% if company_form.email.errors %}{{ company_form.email.errors }}{% endif %}
+          </div>
+          <div class="field-group">
+            <label for="{{ company_form.phone.id_for_label }}">{{ company_form.phone.label }}</label>
+            {{ company_form.phone }}
+            {% if company_form.phone.errors %}{{ company_form.phone.errors }}{% endif %}
+          </div>
+        </div>
+        <div class="field-group temp-password-field">
+          <label>Password</label>
+          <input type="text" value="{{ temporary_password }}" disabled aria-label="Temporary password">
+          <p class="helptext">They'll only ever see and manage the company selected above.</p>
+        </div>
+        <button type="submit" class="btn btn-accent">Enroll Company User</button>
+      </form>
+    </div>
+
+    <div class="register-panel" data-panel="driver">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="register_role" value="driver">
+        {% if driver_form.non_field_errors %}{{ driver_form.non_field_errors }}{% endif %}
+        <div class="field-grid">
+          <div class="field-group">
+            <label for="{{ driver_form.company.id_for_label }}">{{ driver_form.company.label }} *</label>
+            {{ driver_form.company }}
+            {% if driver_form.company.errors %}{{ driver_form.company.errors }}{% endif %}
+          </div>
+          <div class="field-group">
+            <label for="{{ driver_form.full_name.id_for_label }}">{{ driver_form.full_name.label }} *</label>
+            {{ driver_form.full_name }}
+            {% if driver_form.full_name.errors %}{{ driver_form.full_name.errors }}{% endif %}
+          </div>
+        </div>
+        <div class="field-grid">
+          <div class="field-group">
+            <label for="{{ driver_form.phone.id_for_label }}">{{ driver_form.phone.label }} *</label>
+            {{ driver_form.phone }}
+            {% if driver_form.phone.errors %}{{ driver_form.phone.errors }}{% endif %}
+          </div>
+          <div class="field-group">
+            <label for="{{ driver_form.email.id_for_label }}">{{ driver_form.email.label }}</label>
+            {{ driver_form.email }}
+            {% if driver_form.email.errors %}{{ driver_form.email.errors }}{% endif %}
+          </div>
+        </div>
+        <div class="field-group">
+          <label for="{{ driver_form.address.id_for_label }}">{{ driver_form.address.label }}</label>
+          {{ driver_form.address }}
+          {% if driver_form.address.errors %}{{ driver_form.address.errors }}{% endif %}
+        </div>
+        <div class="field-grid">
+          <div class="field-group">
+            <label for="{{ driver_form.license_number.id_for_label }}">{{ driver_form.license_number.label }} *</label>
+            {{ driver_form.license_number }}
+            {% if driver_form.license_number.errors %}{{ driver_form.license_number.errors }}{% endif %}
+          </div>
+          <div class="field-group">
+            <label for="{{ driver_form.license_expiry.id_for_label }}">{{ driver_form.license_expiry.label }}</label>
+            {{ driver_form.license_expiry }}
+            {% if driver_form.license_expiry.errors %}{{ driver_form.license_expiry.errors }}{% endif %}
+          </div>
+        </div>
+        <div class="field-grid">
+          <div class="field-group">
+            <label for="{{ driver_form.status.id_for_label }}">{{ driver_form.status.label }}</label>
+            {{ driver_form.status }}
+            {% if driver_form.status.errors %}{{ driver_form.status.errors }}{% endif %}
+          </div>
+          <div class="field-group">
+            <label for="{{ driver_form.photo.id_for_label }}">{{ driver_form.photo.label }}</label>
+            {{ driver_form.photo }}
+            {% if driver_form.photo.errors %}{{ driver_form.photo.errors }}{% endif %}
+          </div>
+        </div>
+        <div class="field-group">
+          <label for="{{ driver_form.username.id_for_label }}">{{ driver_form.username.label }}</label>
+          {{ driver_form.username }}
+          <p class="helptext">{{ driver_form.username.help_text }}</p>
+          {% if driver_form.username.errors %}{{ driver_form.username.errors }}{% endif %}
+        </div>
+        <div class="field-group temp-password-field">
+          <label>Password</label>
+          <input type="text" value="{{ temporary_password }}" disabled aria-label="Temporary password">
+          <p class="helptext">A login is only created if you fill in the username field above, or leave it blank to skip giving this driver a login for now.</p>
+        </div>
+        <button type="submit" class="btn btn-accent">Register Driver</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section class="cr-section" id="shortcuts">
+  <div class="cr-section-header">
+    <div>
+      <h2>Platform Shortcuts</h2>
+      <p>Jump straight to the day-to-day management pages.</p>
+    </div>
+  </div>
+  <div class="cr-shortcuts">
+    <a href="{% url 'companies:list' %}" class="card cr-shortcut">
+      <span class="cr-shortcut-label">Companies</span>
+      <span class="cr-shortcut-value">{{ stats.companies }}</span>
+    </a>
+    <a href="{% url 'drivers:list' %}" class="card cr-shortcut">
+      <span class="cr-shortcut-label">Drivers</span>
+      <span class="cr-shortcut-value">{{ stats.drivers }}</span>
+    </a>
+    <a href="{% url 'trucks:admin_list' %}" class="card cr-shortcut">
+      <span class="cr-shortcut-label">Truck Tracking</span>
+      <span class="cr-shortcut-value">{{ stats.trucks }}</span>
+    </a>
+    <a href="{% url 'transit:admin_list' %}" class="card cr-shortcut">
+      <span class="cr-shortcut-label">Transits</span>
+      <span class="cr-shortcut-value">{{ stats.active_transits }} active</span>
+    </a>
+    <a href="{% url 'transit:admin_audit_list' %}" class="card cr-shortcut">
+      <span class="cr-shortcut-label">Delivered</span>
+      <span class="cr-shortcut-value">Audit log</span>
+    </a>
+    <a href="{% url 'waybills:admin_waybill_list' %}" class="card cr-shortcut">
+      <span class="cr-shortcut-label">Waybills</span>
+      <span class="cr-shortcut-value">{{ stats.waybills }}</span>
+    </a>
+    <a href="{% url 'dashboard:admin_home' %}" class="card cr-shortcut">
+      <span class="cr-shortcut-label">Dashboard</span>
+      <span class="cr-shortcut-value">Overview</span>
+    </a>
+    <a href="{% url 'dashboard:admin_analytics' %}" class="card cr-shortcut">
+      <span class="cr-shortcut-label">Analysis</span>
+      <span class="cr-shortcut-value">Reports</span>
+    </a>
+    <a href="{% url 'accounts:admin_profile' %}" class="card cr-shortcut">
+      <span class="cr-shortcut-label">My Profile</span>
+      <span class="cr-shortcut-value">Account</span>
+    </a>
+  </div>
+</section>
+
+<script>
+(function () {
+  var tabs = document.querySelectorAll('.register-tab-btn');
+  var panels = document.querySelectorAll('.register-panel');
+
+  function activate(name) {
+    tabs.forEach(function (btn) { btn.classList.toggle('is-active', btn.dataset.tab === name); });
+    panels.forEach(function (p) { p.classList.toggle('is-active', p.dataset.panel === name); });
+  }
+
+  tabs.forEach(function (btn) {
+    btn.addEventListener('click', function () { activate(btn.dataset.tab); });
+  });
+
+  activate('{{ active_tab }}' || 'admin');
+})();
+</script>
+{% endblock %}

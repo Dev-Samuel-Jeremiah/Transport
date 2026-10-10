@@ -5,7 +5,17 @@ from django.shortcuts import redirect
 
 
 class AdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
-    """Restrict a view to platform admins only."""
+    """Restrict a view to platform admins only.
+
+    Also gates every view behind the temporary-password check, same as
+    CompanyRequiredMixin: an admin account still on the shared temporary
+    password is bounced to their profile until they set a real one. This
+    only affects admins registered through the app (role=ADMIN with the
+    flag set) — superuser accounts made via createsuperuser never carry it.
+    Set allow_temporary_password = True on the one view that must stay
+    reachable regardless (the profile page itself)."""
+
+    allow_temporary_password = False
 
     def test_func(self):
         return self.request.user.is_authenticated and self.request.user.is_admin_role
@@ -14,6 +24,18 @@ class AdminRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
         if not self.request.user.is_authenticated:
             return super().handle_no_permission()
         raise PermissionDenied("This area is restricted to administrators.")
+
+    def dispatch(self, request, *args, **kwargs):
+        user = request.user
+        if (
+            user.is_authenticated
+            and user.is_admin_role
+            and user.password_is_temporary
+            and not self.allow_temporary_password
+        ):
+            messages.warning(request, "Please set a new password before continuing.")
+            return redirect('accounts:admin_profile')
+        return super().dispatch(request, *args, **kwargs)
 
 
 class CompanyRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):

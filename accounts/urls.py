@@ -13,8 +13,12 @@ urlpatterns = [
     ), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
 
-    # Admin: enroll and manage company users
-    path('users/', views.UserListView.as_view(), name='user_list'),
+    # Admin: the one dashboard for people, access and a network overview
+    path('control-room/', views.ControlRoomView.as_view(), name='control_room'),
+    path('profile/', views.AdminProfileView.as_view(), name='admin_profile'),
+    path('admins/<int:pk>/edit/', views.AdminEditView.as_view(), name='admin_edit'),
+
+    # Admin: enroll/edit a company user from that company's own page
     path('users/enroll/', views.UserEnrollView.as_view(), name='user_enroll'),
     path('users/<int:pk>/reset-password/', views.UserResetPasswordView.as_view(), name='user_reset_password'),
     path('users/<int:pk>/edit/', views.UserEditView.as_view(), name='user_edit'),

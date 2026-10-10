@@ -108,3 +108,76 @@ class UserEditForm(_UserProfileForm):
         self._apply(self.instance)
         self.instance.save()
         return self.instance
+
+
+class _AdminProfileForm(forms.Form):
+    """Fields shared by registering and editing an administrator."""
+
+    full_name = forms.CharField(max_length=150)
+    username = forms.CharField(
+        max_length=150,
+        help_text="What they type to sign in. Letters, digits and . @ + - _ only — no spaces.",
+    )
+    email = forms.EmailField(required=False)
+    phone = forms.CharField(max_length=20, required=False)
+
+    def __init__(self, *args, instance=None, **kwargs):
+        self.instance = instance
+        if instance is not None:
+            kwargs['initial'] = {
+                'full_name': instance.get_full_name(),
+                'username': instance.username,
+                'email': instance.email,
+                'phone': instance.phone,
+                **(kwargs.get('initial') or {}),
+            }
+        super().__init__(*args, **kwargs)
+
+    def clean_full_name(self):
+        return ' '.join(self.cleaned_data['full_name'].split())
+
+    def clean_username(self):
+        username = self.cleaned_data['username'].strip()
+        if self.instance is not None and username == self.instance.username:
+            return username
+        UnicodeUsernameValidator()(username)
+        taken = User.objects.filter(username__iexact=username)
+        if self.instance is not None:
+            taken = taken.exclude(pk=self.instance.pk)
+        if taken.exists():
+            raise forms.ValidationError("That username is already taken.")
+        return username
+
+    def _apply(self, user):
+        data = self.cleaned_data
+        first_name, _, last_name = data['full_name'].partition(' ')
+        user.first_name = first_name
+        user.last_name = last_name
+        user.username = data['username']
+        user.email = data['email']
+        user.phone = data['phone']
+
+
+class AdminEnrollForm(_AdminProfileForm):
+    """Register a new platform administrator — full access, no company
+    scoping. Created with the shared temporary password and flagged, same
+    as every other role: they must set their own on first sign-in."""
+
+    def save(self):
+        user = User(role=User.Role.ADMIN, password_is_temporary=True)
+        self._apply(user)
+        # set_password (not create_user(password=...)) so the temporary
+        # password bypasses AUTH_PASSWORD_VALIDATORS, which would reject it.
+        user.set_password(TEMPORARY_PASSWORD)
+        user.save()
+        return user
+
+
+class AdminEditForm(_AdminProfileForm):
+    """Edit an administrator's profile, including their username. Never
+    touches the password — resetting it is a separate action."""
+
+    def save(self):
+        self._apply(self.instance)
+        self.instance.save()
+        return self.instance

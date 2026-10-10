@@ -17,6 +17,8 @@ from .analytics import PERIOD_CHOICES, build_analytics
 @login_required
 def redirect_by_role(request):
     if request.user.is_admin_role:
+        if request.user.password_is_temporary:
+            return redirect('accounts:admin_profile')
         return redirect('dashboard:admin_home')
     if request.user.is_driver_role:
         return redirect('drivers:profile')
@@ -38,10 +40,10 @@ class AdminHomeView(AdminRequiredMixin, TemplateView):
 
         ctx.update({
             'company_count': Company.objects.count(),
-            'active_company_count': Company.objects.filter(status=Company.Status.ACTIVE).count(),
             'driver_count': Driver.objects.count(),
             'truck_count': Truck.objects.count(),
             'waybill_count': Waybill.objects.count(),
+            'delivered_count': Transit.objects.filter(status=Transit.Status.DELIVERED).count(),
             'trucks_on_trip': Truck.objects.filter(status=Truck.Status.ON_TRIP).count(),
             'active_transits': Transit.objects.filter(status=Transit.Status.IN_TRANSIT).select_related(
                 'company', 'truck', 'driver'

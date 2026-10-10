@@ -253,7 +253,7 @@
           </span>
           <h2>Users ({{ users.count }})</h2>
         </div>
-        {% if users %}<a href="{% url 'accounts:user_list' %}?company={{ company.pk }}" class="btn btn-outline btn-sm">Manage</a>{% endif %}
+        {% if users %}<a href="{% url 'accounts:control_room' %}?company={{ company.pk }}" class="btn btn-outline btn-sm">Manage</a>{% endif %}
       </div>
       <div class="info-card-body">
         {% if users %}

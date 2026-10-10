@@ -193,7 +193,7 @@
   /* KPI grid */
   .admin-stat-grid {
     display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 16px;
     margin-bottom: 28px;
   }
@@ -768,9 +768,9 @@
       <div class="admin-stat-note">Registered organisations</div>
     </a>
 
-    <a class="admin-stat-tile" href="{% url 'companies:list' %}">
+    <a class="admin-stat-tile" href="{% url 'transit:admin_audit_list' %}">
       <div class="admin-stat-top">
-        <span class="admin-stat-label">Active companies</span>
+        <span class="admin-stat-label">Delivered</span>
         <span class="admin-stat-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
             <circle cx="12" cy="12" r="8"/>
@@ -778,41 +778,13 @@
           </svg>
         </span>
       </div>
-      <div class="admin-stat-value">{{ active_company_count }}</div>
-      <div class="admin-stat-note live">● Operational now</div>
-    </a>
-
-    <a class="admin-stat-tile" href="{% url 'drivers:list' %}">
-      <div class="admin-stat-top">
-        <span class="admin-stat-label">Drivers</span>
-        <span class="admin-stat-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
-            <circle cx="12" cy="8" r="3.3"/>
-            <path d="M5 20c.6-3.5 3-5.3 7-5.3s6.4 1.8 7 5.3"/>
-          </svg>
-        </span>
-      </div>
-      <div class="admin-stat-value">{{ driver_count }}</div>
-      <div class="admin-stat-note">Network workforce</div>
-    </a>
-
-    <a class="admin-stat-tile" href="{% url 'trucks:admin_list' %}">
-      <div class="admin-stat-top">
-        <span class="admin-stat-label">Trucks</span>
-        <span class="admin-stat-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
-            <path d="M3 5h11v11H3zM14 9h4l3 3v4h-7z"/>
-            <circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>
-          </svg>
-        </span>
-      </div>
-      <div class="admin-stat-value">{{ truck_count }}</div>
-      <div class="admin-stat-note">Fleet vehicles tracked</div>
+      <div class="admin-stat-value">{{ delivered_count }}</div>
+      <div class="admin-stat-note live">● Completed deliveries</div>
     </a>
 
     <a class="admin-stat-tile" href="{% url 'waybills:admin_waybill_list' %}">
       <div class="admin-stat-top">
-        <span class="admin-stat-label">Waybills</span>
+        <span class="admin-stat-label">Records</span>
         <span class="admin-stat-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
             <path d="M6 3h9l4 4v14H6z"/>

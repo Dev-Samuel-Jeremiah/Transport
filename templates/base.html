@@ -756,6 +756,18 @@
 
         {% if user.is_admin_role %}
 
+          {% if user.password_is_temporary %}
+
+            <nav class="nav-group">
+              <div class="nav-label">Account</div>
+              <a class="nav-link active" href="{% url 'accounts:admin_profile' %}">
+                <span class="dot"></span>
+                Change Password
+              </a>
+            </nav>
+
+          {% else %}
+
           <nav class="nav-group">
             <div class="nav-label">Overview</div>
 
@@ -777,6 +789,18 @@
           </nav>
 
           <nav class="nav-group">
+            <div class="nav-label">Team</div>
+
+            <a
+              class="nav-link {% if request.resolver_match.view_name == 'accounts:control_room' %}active{% endif %}"
+              href="{% url 'accounts:control_room' %}"
+            >
+              <span class="dot"></span>
+              Control Room
+            </a>
+          </nav>
+
+          <nav class="nav-group">
             <div class="nav-label">Network</div>
 
             <a
@@ -785,22 +809,6 @@
             >
               <span class="dot"></span>
               Companies
-            </a>
-
-            <a
-              class="nav-link {% if request.resolver_match.app_name == 'accounts' and 'users' in request.path %}active{% endif %}"
-              href="{% url 'accounts:user_list' %}"
-            >
-              <span class="dot"></span>
-              Users
-            </a>
-
-            <a
-              class="nav-link {% if 'drivers' in request.path %}active{% endif %}"
-              href="{% url 'drivers:list' %}"
-            >
-              <span class="dot"></span>
-              Drivers
             </a>
 
             <a
@@ -832,9 +840,11 @@
               href="{% url 'waybills:admin_waybill_list' %}"
             >
               <span class="dot"></span>
-              Waybills
+              Records
             </a>
           </nav>
+
+          {% endif %}
 
         {% elif user.is_driver_role %}
 
