@@ -20,7 +20,7 @@
 
 <div class="grid-2">
   <div class="stack">
-    <div class="card">
+    <div class="card card-pad">
       <h2 class="section-title">Update Location & Status</h2>
       <form method="post" action="{% url 'trucks:company_location_update' truck.pk %}">
         {% csrf_token %}
@@ -38,7 +38,7 @@
       {% endif %}
     </div>
 
-    <div class="card">
+    <div class="card card-pad">
       <h2 class="section-title">Current Load</h2>
       <table style="margin-bottom:16px;">
         <tbody>
@@ -64,7 +64,7 @@
       </details>
     </div>
 
-    <div class="card">
+    <div class="card card-pad">
       <h2 class="section-title">Transit History</h2>
       {% if transits %}
         <table>
@@ -84,7 +84,7 @@
     </div>
   </div>
 
-  <div class="card">
+  <div class="card card-pad">
     <h2 class="section-title">Documents</h2>
     {% if documents %}
       <table style="margin-bottom:16px;">

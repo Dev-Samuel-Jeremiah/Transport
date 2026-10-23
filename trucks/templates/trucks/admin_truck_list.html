@@ -9,7 +9,7 @@
   </div>
 </div>
 
-<form method="get" class="field-group" style="max-width:620px;display:flex;gap:10px;flex-wrap:wrap;">
+<form method="get" class="field-group" style="display:flex;gap:10px;flex-wrap:wrap;">
   <input type="text" name="q" placeholder="Search plate number…" value="{{ request.GET.q }}">
   <input type="text" name="location" placeholder="Filter by location…" value="{{ request.GET.location }}">
   <select name="status" onchange="this.form.submit()">

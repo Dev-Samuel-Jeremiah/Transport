@@ -273,10 +273,12 @@
         var(--slate-50);
     }
 
-    .main > * {
+    /* One centred content column. Children keep their own max-width and
+       stay left-aligned under the page header instead of drifting to the
+       middle of the screen. */
+    .main-inner {
       max-width: 1500px;
-      margin-right: auto;
-      margin-left: auto;
+      margin: 0 auto;
     }
 
     /* Notification messages */
@@ -328,14 +330,21 @@
 
     .page-header {
       display: flex;
-      align-items: flex-start;
+      align-items: flex-end;
       justify-content: space-between;
-      gap: 20px;
+      flex-wrap: wrap;
+      gap: 16px 24px;
       margin-bottom: 24px;
     }
 
+    .page-header > :last-child:not(:first-child) {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
     .page-eyebrow {
-      margin: 0 0 7px;
+      margin: 0 0 6px;
       color: var(--blue-500);
       font-size: 0.72rem;
       font-weight: 800;
@@ -346,15 +355,16 @@
     .page-title {
       margin: 0;
       color: var(--slate-950);
-      font-size: clamp(1.7rem, 3vw, 2.3rem);
+      font-size: clamp(1.55rem, 2.6vw, 2rem);
       font-weight: 800;
-      letter-spacing: -0.04em;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
     }
 
     .page-subtitle {
-      margin: 9px 0 0;
+      margin: 6px 0 0;
       color: var(--slate-500);
-      font-size: 0.94rem;
+      font-size: 0.9rem;
       line-height: 1.55;
     }
 
@@ -363,6 +373,118 @@
       border-radius: 14px;
       background: #ffffff;
       box-shadow: 0 5px 18px rgba(15, 23, 42, 0.035);
+    }
+
+    /* Cards whose content sits directly inside them (simple forms and
+       detail pages). Cards with their own header/body classes stay as-is. */
+    .card-pad {
+      padding: 22px 24px;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      color: var(--slate-950);
+      font-size: 1rem;
+      font-weight: 750;
+      letter-spacing: -0.01em;
+    }
+
+    .card-pad > table {
+      width: calc(100% + 24px);
+      margin: 0 -12px;
+    }
+
+    .card-pad a:not(.btn),
+    .page-eyebrow a {
+      color: #1d4ed8;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .card-pad a:not(.btn):hover,
+    .page-eyebrow a:hover {
+      text-decoration: underline;
+    }
+
+    .card-pad > table td:first-child.text-muted {
+      font-size: 0.84rem;
+    }
+
+    .card-pad > table tbody tr:nth-child(even) {
+      background: transparent;
+    }
+
+    .card-pad > table tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .card-pad > form > .flex-between,
+    .card-pad > form > .form-actions {
+      padding-top: 18px;
+      margin-top: 6px;
+      border-top: 1px solid var(--slate-100);
+    }
+
+    .card-pad .timeline {
+      position: relative;
+      display: grid;
+      gap: 16px;
+      padding-left: 20px;
+    }
+
+    .card-pad .timeline::before {
+      position: absolute;
+      top: 6px;
+      bottom: 6px;
+      left: 5px;
+      width: 2px;
+      border-radius: 2px;
+      background: var(--slate-200);
+      content: "";
+    }
+
+    .card-pad .timeline-item {
+      position: relative;
+    }
+
+    .card-pad .timeline-item::before {
+      position: absolute;
+      top: 4px;
+      left: -20px;
+      width: 12px;
+      height: 12px;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      background: var(--blue-500);
+      box-shadow: 0 0 0 1px var(--slate-300);
+      content: "";
+    }
+
+    .card-pad .timeline-time {
+      color: var(--slate-500);
+      font-size: 0.75rem;
+      font-weight: 650;
+    }
+
+    .card-pad .timeline-title {
+      margin-top: 3px;
+      color: var(--slate-950);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .card-pad .timeline-body {
+      margin-top: 3px;
+      color: var(--slate-600);
+      font-size: 0.84rem;
+    }
+
+    .errorlist {
+      padding: 0;
+      margin: 6px 0 0;
+      color: var(--danger);
+      font-size: 0.8rem;
+      list-style: none;
     }
 
     .btn {
@@ -466,6 +588,25 @@
 
     .field-group {
       margin-bottom: 16px;
+    }
+
+    div.field-group > input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+    div.field-group > select,
+    div.field-group > textarea {
+      width: 100%;
+    }
+
+    /* GET filter forms on list pages render as one left-aligned toolbar. */
+    form.field-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    form.field-group > input:not([type="checkbox"]):not([type="hidden"]) {
+      flex: 1 1 220px;
+      max-width: 340px;
     }
 
     .field-group label {
@@ -585,14 +726,30 @@
       min-width: 0;
     }
 
+    .table-wrap td {
+      font-size: 0.87rem;
+    }
+
     .table-wrap a {
       color: #1d4ed8;
-      font-weight: 700;
+      font-weight: 600;
       text-decoration: none;
     }
 
     .table-wrap a:hover {
       text-decoration: underline;
+    }
+
+    /* The select-all bar on list pages becomes the table's top strip.
+       :has() raises specificity above each page's own .bulk-actions-bar. */
+    .bulk-actions-bar:has(+ .table-wrap) {
+      margin-bottom: 0;
+      border-bottom: 0;
+      border-radius: 14px 14px 0 0;
+    }
+
+    .bulk-actions-bar + .table-wrap {
+      border-radius: 0 0 14px 14px;
     }
 
     .empty-state {
@@ -612,6 +769,7 @@
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 24px;
+      align-items: start;
     }
 
     .stack {
@@ -695,6 +853,7 @@
       }
 
       .page-header {
+        align-items: flex-start;
         flex-direction: column;
       }
 
@@ -953,6 +1112,7 @@
     </aside>
 
     <main class="main">
+     <div class="main-inner">
 
       {% if messages %}
         <ul class="messages">
@@ -963,6 +1123,7 @@
       {% endif %}
 
       {% block content %}{% endblock %}
+     </div>
     </main>
 
   </div>

@@ -2,972 +2,280 @@
 {% block title %}Admin Dashboard · Freightline{% endblock %}
 
 {% block content %}
-<style>
-  :root {
-    --admin-ink: #13213d;
-    --admin-muted: #7a879e;
-    --admin-line: #e5eaf2;
-    --admin-primary: #4666e8;
-    --admin-primary-dark: #2945bd;
-    --admin-indigo: #202e78;
-    --admin-teal: #11af96;
-    --admin-amber: #f59e0b;
-    --admin-red: #e84a65;
-    --admin-surface: #ffffff;
-    --admin-soft: #f6f8fc;
-    --admin-shadow: 0 12px 35px rgba(27, 46, 83, 0.08);
-    --admin-shadow-hover: 0 20px 42px rgba(27, 46, 83, 0.14);
-  }
-
-  .admin-dashboard {
-    max-width: 1480px;
-    margin: 0 auto;
-    padding: 12px 0 48px;
-    color: var(--admin-ink);
-  }
-
-  .admin-dashboard *,
-  .admin-dashboard *::before,
-  .admin-dashboard *::after {
-    box-sizing: border-box;
-  }
-
-  /* Hero */
-  .admin-hero {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 28px;
-    min-height: 235px;
-    overflow: hidden;
-    margin-bottom: 27px;
-    padding: 38px 42px;
-    border: 1px solid rgba(255, 255, 255, 0.13);
-    border-radius: 25px;
-    background:
-      radial-gradient(circle at 82% 20%, rgba(80, 114, 255, 0.68), transparent 23%),
-      radial-gradient(circle at 94% 94%, rgba(21, 206, 174, 0.23), transparent 25%),
-      linear-gradient(120deg, #101a42 0%, #21327f 52%, #3f61dd 100%);
-    box-shadow: 0 22px 50px rgba(28, 50, 145, 0.22);
-    color: #fff;
-  }
-
-  .admin-hero::before,
-  .admin-hero::after {
-    position: absolute;
-    border: 1px solid rgba(255, 255, 255, 0.13);
-    border-radius: 50%;
-    content: "";
-    pointer-events: none;
-  }
-
-  .admin-hero::before {
-    width: 440px;
-    height: 440px;
-    top: -278px;
-    right: 8%;
-  }
-
-  .admin-hero::after {
-    width: 270px;
-    height: 270px;
-    right: -70px;
-    bottom: -165px;
-  }
-
-  .admin-hero-content,
-  .admin-hero-actions {
-    position: relative;
-    z-index: 1;
-  }
-
-  .admin-hero-content {
-    max-width: 690px;
-  }
-
-  .admin-hero .page-eyebrow {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0 0 13px;
-    color: rgba(255, 255, 255, 0.74);
-    font-size: 0.71rem;
-    font-weight: 800;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-  }
-
-  .admin-hero .page-eyebrow::before {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #51e6bf;
-    box-shadow: 0 0 0 5px rgba(81, 230, 191, 0.16);
-    content: "";
-    animation: admin-pulse 2.1s ease-in-out infinite;
-  }
-
-  .admin-hero .page-title {
-    margin: 0;
-    color: #fff;
-    font-size: clamp(2rem, 4vw, 3.1rem);
-    font-weight: 800;
-    letter-spacing: -0.055em;
-    line-height: 1;
-  }
-
-  .admin-hero .page-subtitle {
-    margin: 16px 0 0;
-    color: rgba(255, 255, 255, 0.74);
-    font-size: 0.97rem;
-    line-height: 1.7;
-  }
-
-  .admin-hero-actions {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    flex-shrink: 0;
-  }
-
-  .admin-hero-actions .btn { white-space: nowrap; }
-
-  .admin-hero-actions .btn-outline {
-    border-color: rgba(255, 255, 255, 0.34);
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
-  }
-
-  .admin-hero-actions .btn-outline:hover {
-    background: rgba(255, 255, 255, 0.16);
-  }
-
-  .network-status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 13px;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    border-radius: 10px;
-    background: rgba(7, 16, 61, 0.2);
-    color: rgba(255, 255, 255, 0.84);
-    font-size: 0.74rem;
-    font-weight: 750;
-    white-space: nowrap;
-  }
-
-  .network-status::before {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #4beab8;
-    box-shadow: 0 0 0 5px rgba(75, 234, 184, 0.15);
-    content: "";
-  }
-
-  .admin-hero .btn-accent {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 45px;
-    padding: 0 18px;
-    border: 0;
-    border-radius: 11px;
-    background: #fff;
-    box-shadow: 0 10px 25px rgba(9, 20, 71, 0.22);
-    color: var(--admin-primary-dark);
-    font-weight: 800;
-    text-decoration: none;
-    white-space: nowrap;
-    transition: transform 0.22s ease, box-shadow 0.22s ease;
-  }
-
-  .admin-hero .btn-accent:hover {
-    box-shadow: 0 15px 31px rgba(9, 20, 71, 0.3);
-    color: #1e37a5;
-    transform: translateY(-3px);
-  }
-
-  /* KPI grid */
-  .admin-stat-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 16px;
-    margin-bottom: 28px;
-  }
-
-  .admin-stat-tile {
-    position: relative;
-    display: block;
-    min-height: 151px;
-    overflow: hidden;
-    padding: 20px;
-    border: 1px solid var(--admin-line);
-    border-radius: 18px;
-    background: var(--admin-surface);
-    box-shadow: var(--admin-shadow);
-    color: inherit;
-    text-decoration: none;
-    cursor: pointer;
-    animation: admin-enter 0.5s ease both;
-    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-  }
-
-  .admin-stat-tile:focus-visible {
-    outline: 2px solid var(--admin-primary);
-    outline-offset: 2px;
-  }
-
-  .admin-stat-tile:nth-child(2) { animation-delay: 0.05s; }
-  .admin-stat-tile:nth-child(3) { animation-delay: 0.1s; }
-  .admin-stat-tile:nth-child(4) { animation-delay: 0.15s; }
-  .admin-stat-tile:nth-child(5) { animation-delay: 0.2s; }
-  .admin-stat-tile:nth-child(6) { animation-delay: 0.25s; }
-
-  .admin-stat-tile::after {
-    position: absolute;
-    width: 80px;
-    height: 80px;
-    right: -30px;
-    bottom: -31px;
-    border-radius: 50%;
-    background: #edf1ff;
-    content: "";
-  }
-
-  .admin-stat-tile:hover {
-    border-color: #cbd5ff;
-    box-shadow: var(--admin-shadow-hover);
-    transform: translateY(-5px);
-  }
-
-  .admin-stat-tile.accent {
-    border-color: #cbd7ff;
-    background: linear-gradient(135deg, #ffffff 0%, #eff3ff 100%);
-  }
-
-  .admin-stat-tile.accent::after {
-    background: #d5dfff;
-  }
-
-  .admin-stat-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 9px;
-  }
-
-  .admin-stat-label {
-    color: var(--admin-muted);
-    font-size: 0.67rem;
-    font-weight: 800;
-    letter-spacing: 0.085em;
-    text-transform: uppercase;
-  }
-
-  .admin-stat-icon {
-    display: grid;
-    width: 33px;
-    height: 33px;
-    place-items: center;
-    border-radius: 10px;
-    background: #edf1ff;
-    color: var(--admin-primary);
-  }
-
-  .admin-stat-icon svg {
-    width: 17px;
-    height: 17px;
-  }
-
-  .admin-stat-value {
-    position: relative;
-    z-index: 1;
-    margin-top: 21px;
-    color: var(--admin-ink);
-    font-size: clamp(1.65rem, 2.2vw, 2.15rem);
-    font-weight: 800;
-    letter-spacing: -0.05em;
-    line-height: 1;
-  }
-
-  .admin-stat-tile.accent .admin-stat-value {
-    color: var(--admin-primary);
-  }
-
-  .admin-stat-note {
-    position: relative;
-    z-index: 1;
-    margin-top: 11px;
-    color: #8c98ac;
-    font-size: 0.72rem;
-  }
-
-  .admin-stat-note.live {
-    color: var(--admin-teal);
-    font-weight: 750;
-  }
-
-  /* Main two-column layout */
-  .admin-content-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.12fr) minmax(360px, 0.88fr);
-    gap: 26px;
-    align-items: start;
-  }
-
-  .admin-section-header {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 15px;
-    margin-bottom: 15px;
-  }
-
-  .admin-section-title {
-    margin: 0;
-    color: var(--admin-ink);
-    font-size: 1.18rem;
-    font-weight: 800;
-    letter-spacing: -0.03em;
-  }
-
-  .admin-section-description {
-    margin: 5px 0 0;
-    color: var(--admin-muted);
-    font-size: 0.84rem;
-  }
-
-  /* Transit manifests */
-  .admin-transit-list {
-    display: grid;
-    gap: 13px;
-  }
-
-  .admin-manifest {
-    position: relative;
-    overflow: hidden;
-    padding: 20px 21px;
-    border: 1px solid var(--admin-line);
-    border-radius: 17px;
-    background: #fff;
-    box-shadow: 0 7px 20px rgba(27, 45, 80, 0.045);
-    transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
-  }
-
-  .admin-manifest::before {
-    position: absolute;
-    top: 18px;
-    bottom: 18px;
-    left: 0;
-    width: 4px;
-    border-radius: 0 4px 4px 0;
-    background: var(--admin-primary);
-    content: "";
-    opacity: 0;
-    transition: opacity 0.25s ease;
-  }
-
-  .admin-manifest:hover {
-    border-color: #cbd5ff;
-    box-shadow: var(--admin-shadow-hover);
-    transform: translateX(4px);
-  }
-
-  .admin-manifest:hover::before {
-    opacity: 1;
-  }
-
-  .admin-manifest-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-  }
-
-  .admin-manifest-code {
-    color: var(--admin-primary);
-    font-size: 0.82rem;
-    font-weight: 800;
-    letter-spacing: 0.04em;
-  }
-
-  .admin-manifest-route {
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    margin: 18px 0 16px;
-    color: var(--admin-ink);
-    font-size: 1rem;
-    font-weight: 750;
-    line-height: 1.35;
-  }
-
-  .admin-route-location {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .admin-route-line {
-    position: relative;
-    width: 35px;
-    height: 1px;
-    flex: 0 0 35px;
-    background: #aebcf1;
-  }
-
-  .admin-route-line::after {
-    position: absolute;
-    top: -3px;
-    right: 0;
-    width: 7px;
-    height: 7px;
-    border-top: 1px solid var(--admin-primary);
-    border-right: 1px solid var(--admin-primary);
-    content: "";
-    transform: rotate(45deg);
-  }
-
-  .admin-manifest-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding-top: 14px;
-    border-top: 1px solid #edf0f5;
-  }
-
-  .admin-manifest-meta span {
-    padding: 6px 9px;
-    border-radius: 7px;
-    background: #f6f8fb;
-    color: var(--admin-muted);
-    font-size: 0.73rem;
-  }
-
-  .admin-manifest-meta strong {
-    margin-left: 3px;
-    color: #43516a;
-    font-weight: 800;
-  }
-
-  /* Side cards */
-  .admin-stack {
-    display: grid;
-    gap: 23px;
-  }
-
-  .admin-card {
-    overflow: hidden;
-    border: 1px solid var(--admin-line);
-    border-radius: 18px;
-    background: #fff;
-    box-shadow: var(--admin-shadow);
-  }
-
-  .admin-card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 13px;
-    padding: 18px 20px;
-    border-bottom: 1px solid #edf0f4;
-    background: linear-gradient(180deg, #fff 0%, #fbfcff 100%);
-  }
-
-  .admin-card-heading {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .admin-card-icon {
-    display: grid;
-    width: 31px;
-    height: 31px;
-    place-items: center;
-    border-radius: 9px;
-    background: #edf1ff;
-    color: var(--admin-primary);
-  }
-
-  .admin-card-icon.warning {
-    background: #fff4df;
-    color: #cb8510;
-  }
-
-  .admin-card-icon.success {
-    background: #e5f8f2;
-    color: #0b9f86;
-  }
-
-  .admin-card-icon svg {
-    width: 16px;
-    height: 16px;
-  }
-
-  .admin-card-title {
-    margin: 0;
-    color: var(--admin-ink);
-    font-size: 0.95rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-  }
-
-  .admin-card-body {
-    padding: 7px 20px 13px;
-  }
-
-  .admin-mini-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .admin-mini-table td {
-    padding: 12px 0;
-    border-bottom: 1px solid #f0f2f6;
-    color: #536078;
-    font-size: 0.77rem;
-    vertical-align: middle;
-  }
-
-  .admin-mini-table tr:last-child td {
-    border-bottom: 0;
-  }
-
-  .admin-mini-table td + td {
-    padding-left: 12px;
-  }
-
-  .admin-mini-table a {
-    color: var(--admin-primary-dark);
-    font-weight: 800;
-    text-decoration: none;
-  }
-
-  .admin-mini-table a:hover {
-    color: var(--admin-primary);
-  }
-
-  .admin-table-route {
-    max-width: 155px;
-    overflow: hidden;
-    color: var(--admin-muted);
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .admin-empty-copy {
-    margin: 0;
-    padding: 15px 0 13px;
-    color: var(--admin-muted);
-    font-size: 0.82rem;
-  }
-
-  .admin-empty-state {
-    padding: 45px 24px;
-    border: 1px dashed #cbd5e9;
-    border-radius: 17px;
-    background: linear-gradient(135deg, #fcfdff, #f5f8ff);
-    color: var(--admin-muted);
-    text-align: center;
-  }
-
-  .admin-empty-state p {
-    margin: 0;
-    font-size: 0.87rem;
-  }
-
-  .admin-view-all {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    margin-top: 17px;
-    color: var(--admin-primary);
-    font-size: 0.82rem;
-    font-weight: 800;
-    text-decoration: none;
-    transition: gap 0.2s ease;
-  }
-
-  .admin-view-all:hover {
-    gap: 11px;
-    color: var(--admin-primary-dark);
-  }
-
-  /* Badge compatibility */
-  .admin-dashboard .badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 23px;
-    padding: 4px 8px;
-    border-radius: 99px;
-    font-size: 0.66rem;
-    font-weight: 800;
-    line-height: 1;
-  }
-
-  .admin-dashboard .badge-info {
-    background: #e8edff;
-    color: #3655c7;
-  }
-
-  .admin-dashboard .badge-ok {
-    background: #e1f8f1;
-    color: #078c78;
-  }
-
-  .admin-dashboard .badge-warn {
-    background: #fff4dd;
-    color: #b87600;
-  }
-
-  .admin-dashboard .badge-danger {
-    background: #ffeaee;
-    color: #c52e4e;
-  }
-
-  .admin-dashboard .badge-neutral {
-    background: #edf0f4;
-    color: #68758a;
-  }
-
-  @keyframes admin-enter {
-    from {
-      opacity: 0;
-      transform: translateY(12px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes admin-pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.48; }
-  }
-
-  @media (max-width: 1240px) {
-    .admin-stat-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .admin-content-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  @media (max-width: 760px) {
-    .admin-dashboard {
-      padding-top: 4px;
-    }
-
-    .admin-hero {
-      align-items: flex-start;
-      flex-direction: column;
-      min-height: auto;
-      padding: 29px 24px;
-      border-radius: 20px;
-    }
-
-    .admin-hero-actions {
-      width: 100%;
-      justify-content: space-between;
-    }
-
-    .admin-stat-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .admin-stat-tile {
-      min-height: 135px;
-      padding: 17px;
-    }
-  }
-
-  @media (max-width: 500px) {
-    .admin-hero-actions {
-      align-items: stretch;
-      flex-direction: column;
-    }
-
-    .network-status {
-      justify-content: center;
-    }
-
-    .admin-hero .btn-accent {
-      width: 100%;
-    }
-
-    .admin-stat-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .admin-card-header {
-      align-items: flex-start;
-      flex-direction: column;
-    }
-
-    .admin-card-header .btn {
-      width: 100%;
-      text-align: center;
-    }
-
-    .admin-manifest-route {
-      font-size: 0.9rem;
-    }
-
-    .admin-card-body {
-      padding-right: 16px;
-      padding-left: 16px;
-    }
-
-    .admin-card-header {
-      padding-right: 16px;
-      padding-left: 16px;
-    }
-  }
-</style>
+{% include "includes/dashboard_styles.html" %}
 
 <div class="admin-dashboard">
 
-  <section class="admin-hero">
-    <div class="admin-hero-content">
-      <p class="page-eyebrow">Operations Overview</p>
-      <h1 class="page-title">Network Command Center</h1>
-      <p class="page-subtitle">
-        Monitor every company, vehicle, driver, transit, and critical logistics document from one central workspace.
+  {# ── Header ─────────────────────────────────────────────── #}
+  <header class="ad-header">
+    <div>
+      <p class="ad-date">
+        {% now "l, j F Y" %}
+        <span class="ad-live">Network live</span>
       </p>
+      <h1 class="ad-title">Operations Dashboard</h1>
+      <p class="ad-subtitle">A snapshot of companies, fleet movement and documents across the network.</p>
     </div>
 
-    <div class="admin-hero-actions">
-      <div class="network-status">Network live</div>
-      <a href="{% url 'drivers:onboard' %}" class="btn btn-outline">+ Onboard Driver</a>
-      <a href="{% url 'companies:create' %}" class="btn btn-accent">+ Register Company</a>
-    </div>
-  </section>
-
-  <section class="admin-stat-grid" aria-label="Network summary">
-
-    <a class="admin-stat-tile" href="{% url 'companies:list' %}">
-      <div class="admin-stat-top">
-        <span class="admin-stat-label">Companies</span>
-        <span class="admin-stat-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
-            <path d="M4 21V5l8-3v19M4 9h8M16 8h4v13h-4zM8 13h1M8 17h1M16 12h1M16 16h1"/>
-          </svg>
-        </span>
-      </div>
-      <div class="admin-stat-value">{{ company_count }}</div>
-      <div class="admin-stat-note">Registered organisations</div>
-    </a>
-
-    <a class="admin-stat-tile" href="{% url 'transit:admin_audit_list' %}">
-      <div class="admin-stat-top">
-        <span class="admin-stat-label">Delivered</span>
-        <span class="admin-stat-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
-            <circle cx="12" cy="12" r="8"/>
-            <path d="M8.5 12l2.2 2.2 4.8-5"/>
-          </svg>
-        </span>
-      </div>
-      <div class="admin-stat-value">{{ delivered_count }}</div>
-      <div class="admin-stat-note live">● Completed deliveries</div>
-    </a>
-
-    <a class="admin-stat-tile" href="{% url 'waybills:admin_waybill_list' %}">
-      <div class="admin-stat-top">
-        <span class="admin-stat-label">Records</span>
-        <span class="admin-stat-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
-            <path d="M6 3h9l4 4v14H6z"/>
-            <path d="M15 3v5h5M9 13h6M9 17h6"/>
-          </svg>
-        </span>
-      </div>
-      <div class="admin-stat-value">{{ waybill_count }}</div>
-      <div class="admin-stat-note">Documents processed</div>
-    </a>
-
-    <a class="admin-stat-tile accent" href="{% url 'trucks:admin_list' %}?status=ON_TRIP">
-      <div class="admin-stat-top">
-        <span class="admin-stat-label">Trucks on trip</span>
-        <span class="admin-stat-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
-            <path d="M3 5h11v11H3zM14 9h4l3 3v4h-7z"/>
-            <circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>
-            <path d="M17 11h3"/>
-          </svg>
-        </span>
-      </div>
-      <div class="admin-stat-value">{{ trucks_on_trip }}</div>
-      <div class="admin-stat-note live">● Currently in transit</div>
-    </a>
-
-  </section>
-
-  <div class="admin-content-grid">
-
-    <section>
-      <div class="admin-section-header">
-        <div>
-          <h2 class="admin-section-title">Active Transits</h2>
-          <p class="admin-section-description">Live shipments across every registered company.</p>
-        </div>
-      </div>
-
-      {% if active_transits %}
-        <div class="admin-transit-list">
-          {% for t in active_transits %}
-            <article class="admin-manifest">
-              <div class="admin-manifest-top">
-                <span class="admin-manifest-code mono">{{ t.reference_code }}</span>
-                <span class="badge badge-info">{{ t.get_status_display }}</span>
-              </div>
-
-              <div class="admin-manifest-route">
-                <span class="admin-route-location">{{ t.origin }}</span>
-                <span class="admin-route-line"></span>
-                <span class="admin-route-location">{{ t.destination }}</span>
-              </div>
-
-              <div class="admin-manifest-meta">
-                <span>Company <strong>{{ t.company.name }}</strong></span>
-                <span>Truck <strong class="mono">{{ t.truck.registration_number }}</strong></span>
-              </div>
-            </article>
-          {% endfor %}
-        </div>
-      {% else %}
-        <div class="admin-empty-state">
-          <p>No active transits right now.</p>
-        </div>
-      {% endif %}
-
-      <a href="{% url 'transit:admin_list' %}" class="admin-view-all">
-        View all transits <span>→</span>
+    <div class="ad-actions">
+      <a href="{% url 'drivers:onboard' %}" class="btn btn-outline">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M19 8v6M16 11h6"/></svg>
+        Onboard Driver
       </a>
-    </section>
+      <a href="{% url 'companies:create' %}" class="btn btn-primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        Register Company
+      </a>
+    </div>
+  </header>
 
-    <div class="admin-stack">
+  {# ── KPI row ────────────────────────────────────────────── #}
+  <section class="ad-kpis" aria-label="Network summary">
 
-      <section class="admin-card">
-        <div class="admin-card-header">
-          <div class="admin-card-heading">
-            <span class="admin-card-icon warning">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
-                <path d="M12 4l9 16H3L12 4z"/>
-                <path d="M12 9v4M12 17h.01"/>
-              </svg>
+    <a class="ad-kpi" href="{% url 'companies:list' %}">
+      <span class="ad-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V5l8-3v19M4 9h8M16 8h4v13h-4zM8 13h1M8 17h1M16 12h1M16 16h1"/></svg>
+      </span>
+      <div class="ad-kpi-body">
+        <div class="ad-kpi-label">Companies</div>
+        <div class="ad-kpi-value">{{ company_count }}</div>
+        <div class="ad-kpi-note">{{ driver_count }} drivers · {{ truck_count }} trucks</div>
+      </div>
+      <svg class="ad-kpi-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+    </a>
+
+    <a class="ad-kpi" href="{% url 'trucks:admin_list' %}?status=ON_TRIP">
+      <span class="ad-icon violet">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h11v11H3zM14 9h4l3 3v4h-7z"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+      </span>
+      <div class="ad-kpi-body">
+        <div class="ad-kpi-label">Trucks on trip</div>
+        <div class="ad-kpi-value">{{ trucks_on_trip }}</div>
+        <div class="ad-kpi-note">of {{ truck_count }} in the fleet</div>
+      </div>
+      <svg class="ad-kpi-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      <div class="ad-meter" title="{{ trucks_on_trip }} of {{ truck_count }} trucks on the road">
+        <span style="width: {% widthratio trucks_on_trip truck_count|default:1 100 %}%"></span>
+      </div>
+    </a>
+
+    <a class="ad-kpi" href="{% url 'transit:admin_audit_list' %}">
+      <span class="ad-icon green">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>
+      </span>
+      <div class="ad-kpi-body">
+        <div class="ad-kpi-label">Delivered</div>
+        <div class="ad-kpi-value">{{ delivered_count }}</div>
+        <div class="ad-kpi-note">Completed deliveries</div>
+      </div>
+      <svg class="ad-kpi-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+    </a>
+
+    <a class="ad-kpi" href="{% url 'waybills:admin_waybill_list' %}">
+      <span class="ad-icon amber">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v5h5M9 13h6M9 17h6"/></svg>
+      </span>
+      <div class="ad-kpi-body">
+        <div class="ad-kpi-label">Waybill records</div>
+        <div class="ad-kpi-value">{{ waybill_count }}</div>
+        <div class="ad-kpi-note">Documents processed</div>
+      </div>
+      <svg class="ad-kpi-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+    </a>
+
+  </section>
+
+  <div class="ad-grid">
+
+    {# ── Main column ──────────────────────────────────────── #}
+    <div class="ad-column">
+
+      <section class="ad-panel">
+        <div class="ad-panel-head">
+          <h2 class="ad-panel-title">
+            <span class="ad-icon violet">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h11v11H3zM14 9h4l3 3v4h-7z"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>
             </span>
-            <h2 class="admin-card-title">Documents Needing Attention</h2>
-          </div>
+            Active Transits
+            <span class="ad-count">{{ active_transit_count }}</span>
+          </h2>
+          <a href="{% url 'transit:admin_list' %}" class="ad-link">View all →</a>
         </div>
 
-        <div class="admin-card-body">
-          {% if expiring_documents %}
-            <table class="admin-mini-table">
+        {% if active_transits %}
+          <div class="ad-table-wrap">
+            <table class="ad-table">
+              <thead>
+                <tr>
+                  <th>Reference</th>
+                  <th>Route</th>
+                  <th class="ad-hide-sm">Company</th>
+                  <th>Truck</th>
+                  <th class="ad-hide-sm">Driver</th>
+                </tr>
+              </thead>
               <tbody>
-                {% for doc in expiring_documents %}
-                  <tr>
-                    <td>{{ doc.get_doc_type_display }}</td>
+                {% for t in active_transits %}
+                  <tr data-href="{% url 'transit:admin_detail' t.pk %}">
+                    <td><a class="ad-ref mono" href="{% url 'transit:admin_detail' t.pk %}">{{ t.reference_code }}</a></td>
                     <td>
-                      {% if doc.is_expired %}
-                        <span class="badge badge-danger">Expired</span>
-                      {% else %}
-                        <span class="badge badge-warn">Expiring Soon</span>
-                      {% endif %}
+                      <span class="ad-route">
+                        {{ t.origin }}
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                        {{ t.destination }}
+                      </span>
                     </td>
-                    <td class="mono text-muted">{{ doc.expiry_date|default:"—" }}</td>
+                    <td class="ad-hide-sm">{{ t.company.name }}</td>
+                    <td><span class="ad-plate mono">{{ t.truck.registration_number }}</span></td>
+                    <td class="ad-hide-sm">{% if t.driver %}{{ t.driver.full_name }}{% else %}<span class="ad-muted">Unassigned</span>{% endif %}</td>
                   </tr>
                 {% endfor %}
               </tbody>
             </table>
-          {% else %}
-            <p class="admin-empty-copy">All documents are up to date.</p>
-          {% endif %}
-        </div>
+          </div>
+        {% else %}
+          <div class="ad-empty">No trucks are in transit right now.</div>
+        {% endif %}
       </section>
 
-      <section class="admin-card">
-        <div class="admin-card-header">
-          <div class="admin-card-heading">
-            <span class="admin-card-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
-                <path d="M6 3h9l4 4v14H6z"/>
-                <path d="M15 3v5h5M9 13h6M9 17h6"/>
-              </svg>
+      <section class="ad-panel">
+        <div class="ad-panel-head">
+          <h2 class="ad-panel-title">
+            <span class="ad-icon amber">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v5h5M9 13h6M9 17h6"/></svg>
             </span>
-            <h2 class="admin-card-title">Recent Waybills</h2>
-          </div>
-          <a href="{% url 'waybills:admin_waybill_list' %}" class="btn btn-outline btn-sm">View all</a>
+            Recent Waybills
+          </h2>
+          <a href="{% url 'waybills:admin_waybill_list' %}" class="ad-link">View all →</a>
         </div>
 
-        <div class="admin-card-body">
-          {% if recent_waybills %}
-            <table class="admin-mini-table">
+        {% if recent_waybills %}
+          <div class="ad-table-wrap">
+            <table class="ad-table">
+              <thead>
+                <tr>
+                  <th>Waybill #</th>
+                  <th class="ad-hide-sm">Company</th>
+                  <th>Route</th>
+                  <th class="num ad-hide-sm">Weight (MT)</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
               <tbody>
                 {% for w in recent_waybills %}
                   <tr>
                     <td class="mono"><strong>{{ w.waybill_number }}</strong></td>
-                    <td>{{ w.lti.company.name }}</td>
-                    <td class="admin-table-route" title="{{ w.origin }} → {{ w.destination }}">
-                      {{ w.origin }} → {{ w.destination }}
-                    </td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          {% else %}
-            <p class="admin-empty-copy">No waybills have been uploaded yet.</p>
-          {% endif %}
-        </div>
-      </section>
-
-      <section class="admin-card">
-        <div class="admin-card-header">
-          <div class="admin-card-heading">
-            <span class="admin-card-icon success">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
-                <path d="M4 21V5l8-3v19M4 9h8M16 8h4v13h-4zM8 13h1M8 17h1M16 12h1M16 16h1"/>
-              </svg>
-            </span>
-            <h2 class="admin-card-title">Recently Registered Companies</h2>
-          </div>
-        </div>
-
-        <div class="admin-card-body">
-          {% if recent_companies %}
-            <table class="admin-mini-table">
-              <tbody>
-                {% for c in recent_companies %}
-                  <tr>
+                    <td class="ad-hide-sm">{{ w.lti.company.name }}</td>
                     <td>
-                      <a href="{% url 'companies:detail' c.pk %}">{{ c.name }}</a>
+                      <span class="ad-route">
+                        {{ w.origin }}
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                        {{ w.destination }}
+                      </span>
                     </td>
+                    <td class="num ad-hide-sm">{% if w.weight_mt is not None %}{{ w.weight_mt }}{% else %}<span class="ad-muted">—</span>{% endif %}</td>
                     <td>
-                      <span class="badge {% if c.is_active %}badge-ok{% else %}badge-neutral{% endif %}">
-                        {{ c.get_status_display }}
+                      <span class="badge {% if w.status == 'OFFLOADED' %}badge-ok{% elif w.status == 'IN_TRANSIT' %}badge-info{% elif w.status == 'PENDING' %}badge-warn{% else %}badge-neutral{% endif %}">
+                        {{ w.get_status_display }}
                       </span>
                     </td>
                   </tr>
                 {% endfor %}
               </tbody>
             </table>
-          {% else %}
-            <p class="admin-empty-copy">No companies registered yet.</p>
-          {% endif %}
-        </div>
+          </div>
+        {% else %}
+          <div class="ad-empty">No waybills have been uploaded yet.</div>
+        {% endif %}
       </section>
 
     </div>
+
+    {# ── Side rail ────────────────────────────────────────── #}
+    <aside class="ad-column ad-rail">
+
+      <section class="ad-panel">
+        <div class="ad-panel-head">
+          <h2 class="ad-panel-title">
+            <span class="ad-icon {% if expiring_documents %}amber{% else %}green{% endif %}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>{% if expiring_documents %}<path d="M12 8v4M12 16h.01"/>{% else %}<path d="M9 12l2 2 4-4"/>{% endif %}</svg>
+            </span>
+            Document Alerts
+            {% if expiring_documents %}<span class="ad-count">{{ expiring_documents|length }}</span>{% endif %}
+          </h2>
+        </div>
+
+        {% if expiring_documents %}
+          <ul class="ad-list">
+            {% for doc in expiring_documents %}
+              <li>
+                <div class="ad-list-main">
+                  <span class="ad-list-title">{{ doc.get_doc_type_display }}</span>
+                  <span class="ad-list-sub">
+                    {% firstof doc.company.name doc.driver.full_name doc.truck.registration_number %}
+                    · {{ doc.expiry_date|date:"j M Y"|default:"No date" }}
+                  </span>
+                </div>
+                {% if doc.is_expired %}
+                  <span class="badge badge-danger">Expired</span>
+                {% else %}
+                  <span class="badge badge-warn">Expiring</span>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="ad-clear">
+            <div>
+              <strong>All clear</strong>
+              <span>Every company, driver and truck document is up to date.</span>
+            </div>
+          </div>
+        {% endif %}
+      </section>
+
+      <section class="ad-panel">
+        <div class="ad-panel-head">
+          <h2 class="ad-panel-title">
+            <span class="ad-icon green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V5l8-3v19M4 9h8M16 8h4v13h-4zM8 13h1M8 17h1M16 12h1M16 16h1"/></svg>
+            </span>
+            New Companies
+          </h2>
+          <a href="{% url 'companies:list' %}" class="ad-link">View all →</a>
+        </div>
+
+        {% if recent_companies %}
+          <ul class="ad-list">
+            {% for c in recent_companies %}
+              <li>
+                <span class="ad-avatar">{{ c.name|slice:":1" }}</span>
+                <div class="ad-list-main">
+                  <a class="ad-list-title" href="{% url 'companies:detail' c.pk %}">{{ c.name }}</a>
+                  <span class="ad-list-sub">Joined {{ c.created_at|date:"j M Y" }}</span>
+                </div>
+                <span class="badge {% if c.is_active %}badge-ok{% else %}badge-neutral{% endif %}">
+                  {{ c.get_status_display }}
+                </span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="ad-empty">No companies registered yet.</div>
+        {% endif %}
+      </section>
+
+    </aside>
   </div>
 </div>
+
+<script>
+  // Whole transit rows open the transit; the reference link stays the accessible target.
+  document.querySelectorAll('.ad-table tr[data-href]').forEach(function (row) {
+    row.addEventListener('click', function (event) {
+      if (event.target.closest('a')) return;
+      window.location = row.dataset.href;
+    });
+  });
+</script>
 {% endblock %}

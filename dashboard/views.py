@@ -37,6 +37,7 @@ class AdminHomeView(AdminRequiredMixin, TemplateView):
                list(DriverDocument.objects.select_related('driver')) + \
                list(TruckDocument.objects.select_related('truck'))
         expiring = [d for d in docs if d.is_expiring_soon or d.is_expired]
+        active_transits = Transit.objects.filter(status=Transit.Status.IN_TRANSIT)
 
         ctx.update({
             'company_count': Company.objects.count(),
@@ -45,9 +46,8 @@ class AdminHomeView(AdminRequiredMixin, TemplateView):
             'waybill_count': Waybill.objects.count(),
             'delivered_count': Transit.objects.filter(status=Transit.Status.DELIVERED).count(),
             'trucks_on_trip': Truck.objects.filter(status=Truck.Status.ON_TRIP).count(),
-            'active_transits': Transit.objects.filter(status=Transit.Status.IN_TRANSIT).select_related(
-                'company', 'truck', 'driver'
-            )[:8],
+            'active_transit_count': active_transits.count(),
+            'active_transits': active_transits.select_related('company', 'truck', 'driver')[:8],
             'recent_companies': Company.objects.order_by('-created_at')[:5],
             'expiring_documents': sorted(
                 expiring, key=lambda d: (d.expiry_date is None, d.expiry_date)
@@ -73,6 +73,8 @@ class CompanyHomeView(CompanyRequiredMixin, TemplateView):
             'active_transits': company.transits.filter(status=Transit.Status.IN_TRANSIT).select_related(
                 'truck', 'driver'
             ),
+            'active_transit_count': company.transits.filter(status=Transit.Status.IN_TRANSIT).count(),
+            'trucks_on_trip': company.trucks.filter(status=Truck.Status.ON_TRIP).count(),
             'pending_transits': company.transits.filter(status=Transit.Status.PENDING).count(),
             # All-time completed deliveries — this is what the Delivered
             # stat card links through to on the Delivered Deliveries page.
