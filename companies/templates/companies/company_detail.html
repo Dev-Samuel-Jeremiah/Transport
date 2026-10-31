@@ -127,8 +127,9 @@
 
   .list-row {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 12px;
+    gap: 6px 12px;
     padding: 11px 0;
     border-bottom: 1px solid var(--slate-100);
   }
@@ -143,8 +144,9 @@
   }
 
   .list-row-name {
-    flex: 1;
+    flex: 1 1 140px;
     min-width: 0;
+    overflow-wrap: anywhere;
     color: var(--slate-800);
     font-size: 0.87rem;
     font-weight: 650;
@@ -197,7 +199,7 @@
 
   @media (max-width: 900px) {
     .company-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 </style>

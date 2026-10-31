@@ -663,7 +663,7 @@
   }
 
   @media (max-width: 720px) {
-    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .grid-2, .grid-3 { grid-template-columns: minmax(0, 1fr); }
     .col-chart, .col-axis { gap: 6px; }
     .analysis-scope { flex-direction: row; flex-wrap: wrap; align-items: flex-start; }
     .card { padding: 18px 16px 16px; }

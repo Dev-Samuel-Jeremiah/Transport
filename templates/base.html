@@ -752,6 +752,10 @@
       border-radius: 0 0 14px 14px;
     }
 
+    .m-val {
+      display: contents;
+    }
+
     .empty-state {
       padding: 44px 22px;
       color: var(--slate-500);
@@ -785,80 +789,421 @@
       margin-bottom: 0;
     }
 
-    /* Responsive application shell */
+    /* Responsive application shell
+       Up to 1024px (phones and tablets) the sidebar becomes a slide-in
+       drawer opened from a top bar, and list tables become stacked cards. */
 
-    @media (max-width: 920px) {
-      :root {
-        --sidebar-width: 224px;
-      }
-
-      .sidebar {
-        padding-right: 11px;
-        padding-left: 11px;
-      }
-
-      .main {
-        padding: 24px;
-      }
+    .mobile-bar,
+    .sidebar-close,
+    .sidebar-scrim {
+      display: none;
     }
 
-    @media (max-width: 720px) {
+    img,
+    svg,
+    video {
+      max-width: 100%;
+    }
+
+    @media (max-width: 1024px) {
+      html {
+        -webkit-text-size-adjust: 100%;
+        scroll-padding-top: 72px;
+      }
+
+      .mobile-bar {
+        position: sticky;
+        z-index: 30;
+        top: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 58px;
+        padding: 8px 12px;
+        padding-top: max(8px, env(safe-area-inset-top));
+        background: linear-gradient(90deg, var(--navy-950), var(--navy-800));
+        color: #ffffff;
+      }
+
+      .mobile-bar .brand {
+        min-width: 0;
+      }
+
+      .mobile-bar .brand-mark {
+        width: 34px;
+        height: 34px;
+        flex: 0 0 34px;
+      }
+
+      .menu-btn,
+      .sidebar-close {
+        display: inline-grid;
+        width: 44px;
+        height: 44px;
+        flex: 0 0 44px;
+        place-items: center;
+        padding: 0;
+        border: 0;
+        border-radius: 10px;
+        background: transparent;
+        color: #ffffff;
+        cursor: pointer;
+      }
+
+      .menu-btn:hover,
+      .sidebar-close:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .menu-btn:focus-visible,
+      .sidebar-close:focus-visible {
+        outline: 2px solid var(--blue-400);
+        outline-offset: 1px;
+      }
+
       .sidebar {
-        position: static;
-        width: 100%;
-        min-height: auto;
-        padding: 14px;
-        overflow: visible;
+        z-index: 50;
+        width: min(84vw, 300px);
+        padding-top: max(16px, env(safe-area-inset-top));
+        padding-bottom: max(16px, env(safe-area-inset-bottom));
+        box-shadow: 12px 0 32px rgba(7, 21, 38, 0.35);
+        visibility: hidden;
+        transform: translateX(-100%);
+        transition: transform 0.22s ease, visibility 0.22s;
       }
 
       .brand-wrap {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: space-between;
-        padding: 0 4px 13px;
+        gap: 8px;
       }
 
-      .brand-role {
-        margin-top: 0;
+      .sidebar-close {
+        margin: -4px -4px 0 0;
       }
 
-      .nav-group {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        padding-bottom: 8px;
-        margin: 0;
-        overflow-x: auto;
+      .sidebar-scrim {
+        position: fixed;
+        z-index: 40;
+        display: block;
+        background: rgba(7, 21, 38, 0.55);
+        inset: 0;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.22s ease;
       }
 
-      .nav-label {
-        display: none;
+      body.nav-open {
+        overflow: hidden;
       }
 
-      .nav-link {
-        min-height: 36px;
-        padding: 8px 10px;
-        margin: 0;
-        white-space: nowrap;
+      /* Visible at once, not after the slide, so focus can move in. */
+      body.nav-open .sidebar {
+        visibility: visible;
+        transform: none;
+        transition: transform 0.22s ease, visibility 0s;
       }
 
-      .sidebar-footer {
-        display: none;
+      body.nav-open .sidebar-scrim {
+        opacity: 1;
+        pointer-events: auto;
       }
 
       .main {
         min-height: auto;
-        padding: 20px 16px 30px;
+        padding: 20px 16px 32px;
         margin-left: 0;
       }
 
+      /* Comfortable touch targets. 16px inputs stop iOS zooming on focus. */
+      .btn {
+        min-height: 44px;
+      }
+
+      .btn-sm {
+        min-height: 40px;
+      }
+
+      input:not([type="checkbox"]):not([type="radio"]),
+      select,
+      textarea {
+        font-size: 16px;
+      }
+
+      input,
+      select,
+      textarea {
+        min-width: 0;
+      }
+
+      input[type="file"] {
+        width: 100%;
+      }
+
+      /* Django's "Currently: <long/file/path>" link on file fields. */
+      .field-group a {
+        overflow-wrap: anywhere;
+      }
+
+      input[type="checkbox"],
+      .main .checkbox-cell input[type="checkbox"],
+      .main .select-all-label input[type="checkbox"] {
+        width: 22px;
+        height: 22px;
+      }
+
+      /* List tables -> stacked cards. base.html's script adds .m-table to
+         every table with a header row, so without JS they simply scroll. */
+      .m-wrap {
+        overflow: visible !important;
+      }
+
+      .main table.m-table,
+      .main table.m-table tbody {
+        display: block;
+        width: 100%;
+        min-width: 0;
+      }
+
+      .main table.m-table thead {
+        display: none;
+      }
+
+      .main table.m-table tbody tr,
+      .main table.m-table tbody tr:nth-child(even) {
+        position: relative;
+        display: block;
+        padding: 14px 16px;
+        border-bottom: 6px solid var(--slate-100);
+        background: #ffffff;
+      }
+
+      .main table.m-table tbody tr:last-child {
+        border-bottom: 0;
+      }
+
+      .main table.m-table tbody td {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 14px;
+        width: auto;
+        min-width: 0;
+        max-width: none;
+        padding: 5px 0;
+        border: 0;
+        font-size: 0.88rem;
+        overflow-wrap: anywhere;
+        white-space: normal;
+      }
+
+      .main table.m-table tbody td::before {
+        flex: 0 0 38%;
+        color: var(--slate-500);
+        content: attr(data-label);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0;
+        text-transform: none;
+      }
+
+      .m-val {
+        display: block;
+        min-width: 0;
+        flex: 1;
+        text-align: right;
+      }
+
+      /* A page's own max-width on a cell must not squeeze the card. */
+      .main table.m-table tbody td.company-cell {
+        max-width: none;
+      }
+
+      .m-val .status-stack {
+        align-items: flex-end;
+      }
+
+      .main table.m-table tbody td.m-title {
+        display: block;
+        padding: 0 34px 6px 0;
+        font-size: 0.98rem;
+        font-weight: 700;
+      }
+
+      .main table.m-table tbody td.m-title::before,
+      .main table.m-table tbody td.m-full::before,
+      .main table.m-table tbody td.m-thumb::before,
+      .main table.m-table tbody td.m-check::before {
+        display: none;
+      }
+
+      .main table.m-table tbody td.m-title .m-val,
+      .main table.m-table tbody td.m-full .m-val {
+        text-align: left;
+      }
+
+      .main table.m-table tbody tr.m-has-thumb {
+        padding-left: 62px;
+      }
+
+      .main table.m-table tbody td.m-thumb {
+        position: absolute;
+        top: 14px;
+        left: 16px;
+        display: block;
+        padding: 0;
+      }
+
+      .main table.m-table tbody td.m-check {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        display: block;
+        width: auto;
+        padding: 0;
+      }
+
+      .main table.m-table tbody td.m-empty,
+      .main table.m-table tbody tr:not(.m-open) td.m-extra {
+        display: none;
+      }
+
+      .main table.m-table tbody td.m-full {
+        display: block;
+      }
+
+      /* Cells holding buttons, selects or forms take the full card width. */
+      .main table.m-table tbody td.m-actions {
+        display: block;
+        padding-top: 10px;
+      }
+
+      .main table.m-table tbody td.m-actions::before {
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      .main table.m-table tbody td.m-actions .m-val,
+      .main table.m-table tbody td.m-actions .m-val > * {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        text-align: left;
+      }
+
+      .main table.m-table tbody td.m-actions .btn,
+      .main table.m-table tbody td.m-actions select {
+        flex: 1 1 auto;
+      }
+
+      .main table.m-table tbody td.m-toggle {
+        display: block;
+        padding: 8px 0 0;
+      }
+
+      .main table.m-table tbody td.m-toggle::before {
+        display: none;
+      }
+
+      .m-more {
+        min-height: 40px;
+        padding: 6px 0;
+        border: 0;
+        background: none;
+        color: #1d4ed8;
+        cursor: pointer;
+        font: inherit;
+        font-size: 0.84rem;
+        font-weight: 700;
+      }
+
+      /* Wider screens: fit several fields per row instead of one long column. */
+      @media (min-width: 620px) {
+        .main table.m-table tbody tr,
+        .main table.m-table tbody tr:nth-child(even) {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+          gap: 8px 20px;
+        }
+
+        .main table.m-table tbody td {
+          display: block;
+          padding: 0;
+        }
+
+        .main table.m-table tbody td::before {
+          display: block;
+          margin-bottom: 2px;
+          font-size: 0.72rem;
+        }
+
+        .m-val {
+          text-align: left;
+        }
+
+        .m-val .status-stack {
+          align-items: flex-start;
+        }
+
+        .main table.m-table tbody td.m-title,
+        .main table.m-table tbody td.m-actions,
+        .main table.m-table tbody td.m-toggle,
+        .main table.m-table tbody td.m-full {
+          grid-column: 1 / -1;
+        }
+      }
+    }
+
+    @media (max-width: 720px) {
       .page-header {
         align-items: flex-start;
         flex-direction: column;
       }
 
+      .page-header > :last-child:not(:first-child) {
+        width: 100%;
+      }
+
+      .page-header > :last-child:not(:first-child) .btn,
+      .page-header > a.btn:last-child:not(:first-child) {
+        flex: 1 1 auto;
+      }
+
       .grid-2 {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .card-pad {
+        padding: 18px 16px;
+      }
+
+      .card-pad > table {
+        width: calc(100% + 16px);
+        margin: 0 -8px;
+      }
+
+      .card-pad > table td {
+        padding: 9px 8px;
+        overflow-wrap: anywhere;
+        white-space: normal;
+      }
+
+      .card-pad > table td:first-child {
+        width: 38%;
+      }
+
+      form.field-group > input:not([type="checkbox"]):not([type="hidden"]),
+      form.field-group > select {
+        flex: 1 1 100%;
+        max-width: none;
+        width: 100%;
+      }
+
+      form.field-group > .btn {
+        flex: 1 1 auto;
       }
     }
 
@@ -867,16 +1212,8 @@
         font-size: 1rem;
       }
 
-      .brand-role {
-        display: none;
-      }
-
       .page-title {
-        font-size: 1.65rem;
-      }
-
-      .btn {
-        min-height: 38px;
+        font-size: 1.5rem;
       }
     }
   </style>
@@ -887,7 +1224,22 @@
 <body>
   <div class="app-shell">
 
-    <aside class="sidebar">
+    <header class="mobile-bar">
+      <button type="button" class="menu-btn" id="nav-open" aria-label="Open menu" aria-expanded="false" aria-controls="app-sidebar">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <a
+        class="brand"
+        href="{% if user.is_admin_role %}{% url 'dashboard:admin_home' %}{% elif user.is_driver_role %}{% url 'drivers:profile' %}{% else %}{% url 'dashboard:company_home' %}{% endif %}"
+      >
+        <span class="brand-mark">TRX</span>
+        <span class="brand-name">Freightline</span>
+      </a>
+    </header>
+
+    <div class="sidebar-scrim" id="nav-scrim"></div>
+
+    <aside class="sidebar" id="app-sidebar">
 
       <div class="brand-wrap">
         <div>
@@ -909,6 +1261,10 @@
             {% endif %}
           </div>
         </div>
+
+        <button type="button" class="sidebar-close" id="nav-close" aria-label="Close menu">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
       </div>
 
       {% if user.is_authenticated %}
@@ -1129,5 +1485,145 @@
   </div>
 
   {% block extra_js %}{% endblock %}
+
+  <script>
+    (function () {
+      var mobile = window.matchMedia('(max-width: 1024px)');
+
+      /* ---- Slide-in navigation drawer ---- */
+      var openBtn = document.getElementById('nav-open');
+      var closeBtn = document.getElementById('nav-close');
+      var scrim = document.getElementById('nav-scrim');
+
+      function setNav(open) {
+        var wasOpen = document.body.classList.contains('nav-open');
+        document.body.classList.toggle('nav-open', open);
+        openBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) closeBtn.focus();
+        else if (wasOpen) openBtn.focus();
+      }
+
+      openBtn.addEventListener('click', function () { setNav(true); });
+      closeBtn.addEventListener('click', function () { setNav(false); });
+      scrim.addEventListener('click', function () { setNav(false); });
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') setNav(false);
+      });
+
+      /* ---- List tables become stacked cards on small screens ----
+         Each cell gets its column heading as a label. The first text cell
+         titles the card; status badges and controls always stay visible,
+         and on very wide tables the remaining fields sit behind a toggle. */
+      var MAX_PLAIN_FIELDS = 4;
+      var CONTROLS = 'input:not([type="hidden"]), select, textarea, button, a.btn';
+
+      function wrapValue(cell) {
+        var value = document.createElement('div');
+        value.className = 'm-val';
+        while (cell.firstChild) value.appendChild(cell.firstChild);
+        cell.appendChild(value);
+      }
+
+      function prepareRow(row, headings) {
+        var titled = false;
+        var plain = 0;
+        var extras = 0;
+
+        Array.prototype.forEach.call(row.cells, function (cell, index) {
+          var label = cell.getAttribute('data-m-label') || headings[index] || '';
+          var text = cell.textContent.trim();
+          var control = cell.querySelector(CONTROLS);
+          var loneCheckbox = control && control.type === 'checkbox' && !text;
+
+          cell.setAttribute('data-label', label);
+          wrapValue(cell);
+
+          if (cell.colSpan > 1) {
+            cell.classList.add('m-full');
+          } else if (!label && !text && cell.querySelector('input[type="checkbox"]')) {
+            cell.classList.add('m-check');
+          } else if (!text && !control) {
+            if (cell.querySelector('img')) {
+              cell.classList.add('m-thumb');
+              row.classList.add('m-has-thumb');
+            } else {
+              cell.classList.add('m-empty');
+            }
+          } else if (loneCheckbox) {
+            return;
+          } else if (control) {
+            cell.classList.add('m-actions');
+          } else if (text === '—' || text === '-') {
+            cell.classList.add('m-empty');
+          } else if (!titled) {
+            titled = true;
+            cell.classList.add('m-title');
+          } else if (!cell.querySelector('.badge')) {
+            plain += 1;
+            if (plain > MAX_PLAIN_FIELDS) {
+              cell.classList.add('m-extra');
+              extras += 1;
+            }
+          }
+        });
+
+        if (extras) row.classList.add('m-has-extra');
+      }
+
+      function addToggle(row) {
+        var cell = row.insertCell(-1);
+        var button = document.createElement('button');
+        cell.className = 'm-toggle';
+        button.type = 'button';
+        button.className = 'm-more';
+        button.textContent = 'More details';
+        button.setAttribute('aria-expanded', 'false');
+        button.addEventListener('click', function (event) {
+          var open = row.classList.toggle('m-open');
+          event.stopPropagation();
+          button.textContent = open ? 'Less details' : 'More details';
+          button.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+        cell.appendChild(button);
+      }
+
+      /* The toggle cell exists only on small screens, so the desktop rule
+         that lets the last column absorb spare width keeps working. */
+      function syncToggles() {
+        document.querySelectorAll('tr.m-has-extra').forEach(function (row) {
+          var toggle = row.querySelector('td.m-toggle');
+          if (mobile.matches && !toggle) {
+            addToggle(row);
+          } else if (!mobile.matches && toggle) {
+            toggle.remove();
+            row.classList.remove('m-open');
+          }
+        });
+      }
+
+      document.querySelectorAll('.main table').forEach(function (table) {
+        if (!table.tHead || !table.tBodies.length || !table.tHead.rows.length) return;
+
+        var headings = Array.prototype.map.call(table.tHead.rows[0].cells, function (cell) {
+          return cell.textContent.trim();
+        });
+
+        Array.prototype.forEach.call(table.tBodies[0].rows, function (row) {
+          prepareRow(row, headings);
+        });
+
+        table.classList.add('m-table');
+        if (table.parentElement) table.parentElement.classList.add('m-wrap');
+      });
+
+      function onResize() {
+        if (!mobile.matches) setNav(false);
+        syncToggles();
+      }
+
+      syncToggles();
+      mobile.addEventListener('change', onResize);
+    })();
+  </script>
 </body>
 </html>

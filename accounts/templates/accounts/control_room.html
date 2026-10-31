@@ -248,6 +248,7 @@
 
   .register-tabs {
     display: flex;
+    flex-wrap: wrap;
     gap: 4px;
     padding: 14px 18px 0;
     border-bottom: 1px solid var(--slate-100);
@@ -340,7 +341,14 @@
 
   @media (max-width: 640px) {
     .field-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .cr-filters input[type="text"],
+    .cr-filters select,
+    .cr-filters .btn {
+      flex: 1 1 100%;
+      min-width: 0;
     }
   }
 </style>

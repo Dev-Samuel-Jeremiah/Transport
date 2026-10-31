@@ -447,14 +447,13 @@
 
   @media (max-width: 1024px) {
     .company-transits-page {
-      padding: 8px 4px 32px;
+      padding: 0 0 32px;
     }
   }
 
   @media (max-width: 720px) {
     .company-transits-hero {
       flex-direction: column;
-      padding: 22px 18px;
     }
 
     .company-transits-actions {
@@ -691,7 +690,7 @@
                 <button type="submit" class="btn btn-outline btn-sm">Update</button>
               </form>
             </td>
-            <td>
+            <td data-m-label="Truck position">
                <button type="button" class="position-edit-btn"
                         data-truck-id="{{ t.truck.pk }}"
                         data-truck-plate="{{ t.truck.registration_number }}"

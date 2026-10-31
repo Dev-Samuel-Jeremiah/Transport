@@ -122,7 +122,7 @@
   }
 
   .transit-info-grid.full-width {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .transit-info-item {
@@ -295,7 +295,7 @@
 
   @media (max-width: 900px) {
     .transit-detail-layout {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 
@@ -314,11 +314,11 @@
     }
 
     .transit-info-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
 
     .transit-update-form .coord-row {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 </style>
